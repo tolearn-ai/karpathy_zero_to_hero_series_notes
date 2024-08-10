@@ -1,0 +1,45 @@
+Okay, so let's swing back up where we created the dataset and we see that here
+we only use the first five words. So let me now erase this and let me erase the
+print statements otherwise we'd be printing way too much. And so when we
+process the full dataset of all the words, we now had 228,000 examples instead
+of just 32. So let's now scroll back down. The dataset is much larger.
+Re-initialize the weights, the same number of parameters. They all require
+gradients. And then let's push this printoutLoss.item to be here. And let's
+just see how the optimization goes if we run this. Okay, so we started with a
+fairly high loss, and then as we're optimizing, the loss is coming down. But
+you'll notice that it takes quite a bit of time for every single iteration. So
+let's actually address that. Because we're doing way too much work forwarding
+and backwarding 220,000 examples. Practice what people usually do is they
+perform forward and backward pass and update on many batches of the data. So
+what we will want to do is we want to randomly select some portion of the
+dataset and that's a mini batch, and then only forward backward and update on
+that little mini batch, and then we iterate on those many batches. So in
+PyTorch, we can for example use torch.randint. We can generate numbers between
+0 and 5 and make 32 of them; I believe the size has to be a tuple in PyTorch.
+So we can have a tuple of 32 numbers between 0 and 5, but actually we want
+x.shape of 0 here. And so this creates integers that index into our dataset and
+there's 32 of them. So if our mini-batch size is 32, then we can come here and
+we can first do a mini batch construct. So integers that we want to optimize in
+this single iteration are in the ix, and then we want to index into x with ix
+to only grab those rows. So we're only getting 32 rows of x, and therefore
+embeddings will again be 32 by 3 by 2, not 200,000 by 3 by 2. And then this ix
+has to be used not just to index into x, but also to index into y. And now this
+should be many batches, and this should be much, much faster. So, okay, so it's
+instant almost. So this way, we can run many, many examples nearly instantly
+and decrease the loss much, much faster. Now, because we're only dealing with
+many batches, the quality of our gradient is lower. So the direction is not as
+reliable; it's not the actual gradient direction, but the gradient direction is
+good enough even when it's estimating on only 32 examples that it is useful.
+And so it's much better to have an approximate gradient and just make more
+steps than it is to evaluate the exact gradient and take fewer steps. So that's
+why in practice this works quite well. So let's now continue the optimization.
+Let me take out this lost.item from here and place it over here at the end.
+Okay, so we're hovering around 2.5 or so. However, this is only the loss for
+that mini batch. So let's actually evaluate the loss here for all of x and for
+all of y, just so we have a full sense exactly how well the model is doing
+right now. So right now we're about 2.7 on the entire training set. So let's
+run the optimization for a while. Okay, we're at 2.6, 2.57, 2.53. Okay, so one
+issue of course is we don't know if we're stepping too slow or too fast. So
+this point one I just guessed it. So one question is how do you determine this
+learning rate and how do we gain confidence that we're stepping in the right
+sort of speed?

@@ -1,0 +1,80 @@
+So I'll show you one way to determine a reasonable learning rate. It works as
+follows. Let's reset our parameters to the initial settings. And now let's
+print in every step. But let's only do 10 steps or so. Or maybe 100 steps. We
+want to find a very reasonable search range, if you will. So for example, if
+this is very low, then we see that the loss is barely decreasing. So that's too
+low basically. So let's try this one. So we're decreasing the loss but not very
+quickly. So that's a pretty good low range. Now let's reset it again. And now
+let's try to find the place at which the loss kind of explodes. So maybe at
+negative one. We see that we're minimizing the loss, but you see how it's kind
+of unstable. It goes up and down quite a bit. So negative 1 is probably like a
+fast learning rate. Let's try negative 10. Okay, so this isn't optimizing. This
+is not working very well. So negative 10 is way too big. Negative 1 was already
+kind of big. So therefore, negative 1 was somewhat reasonable if I reset. so
+I'm thinking that the right learning rate is somewhere between negative 0.001
+and negative 1 so the way we can do this here is we can use Torch.LensSpace and
+we want to basically do something like this between 0 and 1 but number of steps
+is one more parameter that's required, let's do 1000 steps this creates 1000
+numbers between 0.001 and 1. But it doesn't really make sense to step between
+these linearly, so instead let me create learning rate exponent. And instead of
+0.001 this will be a negative 3, and this will be a 0. And then the actual LREs
+that we want to search over are going to be 10 to the power of LRE. So now what
+we're doing is we're stepping linearly between the exponents of these learning
+rates. This is 0.001 and this is 1 because 10 to the power of 0 is 1. And
+therefore we are spaced exponentially in this interval. So these are the
+candidate learning rates that we want to sort of like search over roughly. So
+now what we're going to do is here we are going to run the optimization for
+1000 steps and instead of using a fixed number we are going to use learning
+rate indexing into here, lr and make this i. So basically let me reset this to
+be, again, starting from random, creating these learning rates between 0.001
+and one, but exponentially stepped. And here what we're doing is we're
+iterating a thousand times, we're going to use the learning rate that's in the
+beginning very, very low. In the beginning, it's going to be 0.001. But by the
+end, it's going to be 1. And then we're going to step with that learning rate.
+And now what we want to do is we want to keep track of the learning rates that
+we used. And we want to look at the losses that resulted. And so here, let me
+track stats so lri.append and lossi.append loss that item okay so again reset
+everything and then run and so basically we started with a very low learning
+rate and we went all the way up to a learning rate of negative one and now what
+we can do is we can plt.plot and we can plot the two so we can plot the
+learning rates on the x-axis and the losses we saw on the y-axis. And often
+you're going to find that your plot looks something like this, where in the
+beginning you had very low learning rates, so basically anything, barely
+anything happened. Then we got to like a nice spot here, and then as we
+increased the learning rate enough, we basically started to be kind of unstable
+here. So a good learning rate turns out to be somewhere around here. And
+because we have LRI here, we actually may want to do not LR, not the learning
+rate, but the exponent. So that would be the LRE at i is maybe what we want to
+log. So let me reset this and redo that calculation. but now on the x-axis we
+have the exponent of the learning rate and so we can see the exponent of the
+learning rate that is good to use it would be sort of like roughly in the
+valley here because here the learning rates are just way too low and then here
+we expect relatively good learning rates somewhere here and then here things
+are starting to explode so somewhere around negative one x the exponent of the
+learning rate is a pretty good setting and 10 to the negative one is 0.1. So
+0.1 was actually a fairly good learning rate around here. And that's what we
+had in the initial setting. But that's roughly how you would determine it. And
+so here now we can take out the tracking of these. And we can just simply set
+LR to be 10 to the negative 1 or basically otherwise 0.1 as it was before. And
+now we have some confidence that this is actually a fairly good learning rate.
+And so now what we can do is we can crank up the iterations, we can reset our
+optimization, and we can run for a pretty long time using this learning rate.
+Oops, and we don't want to print. It's way too much printing. So let me again
+reset and run 10,000 steps. okay so we're at 2.48 roughly let's run another
+10,000 steps 2.46 and now let's do one learning rate decay what this means is
+we're going to take our learning rate and we're going to 10x lower it and so
+we're at the late stages of training potentially and we may want to go a bit
+slower. Let's do one more actually at 0.1 just to see if we're making a dent
+here. Okay we're still making dent and by the way the bigram loss that we
+achieved last video was 2.45 so we've already surpassed the bigram model. And
+once I get a sense that this is actually kind of starting to plateau off,
+people like to do as I mentioned this learning rate decay. So let's try to
+decay the loss, the learning rate I mean, and we achieve it about 2.3 now.
+Obviously this is janky and not exactly how you would train it in production,
+but this is roughly what you're going through. You first find a decent learning
+rate using the approach that I showed you, then you start with that learning
+rate and you train for a while, and then at the end people like to do a
+learning rate decay where you decay the learning rate by say a factor of 10 and
+you do a few more steps and then you get a trained network, roughly speaking.
+So we've achieved 2.3 and dramatically improved on the bigram language model
+using this simple neural net as described here, using these 3,400 parameters.

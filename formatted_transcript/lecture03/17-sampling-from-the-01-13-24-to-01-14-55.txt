@@ -1,0 +1,18 @@
+Before we wrap up, I also wanted to show how you would sample from the model.
+So we're going to generate 20 samples. At first, we begin with all dots, so
+that's the context, and then until we generate the 0th character again, we're
+going to embed the current context using the embedding table C. Now usually
+here the first dimension was the size of the training set, but here we're only
+working with a single example that we're generating, so this is just dimension
+1, just for simplicity. This embedding then gets projected into the hidden
+state. You get the logits; now we calculate the probabilities for that. You can
+use f.softmax of logits, and that just basically exponentiates logits and makes
+them sum to 1. Similar to cross-entropy, it is careful that there's no
+overflow. Once we have the probabilities, we sample from them using
+Torch.Multinomial to get our next index. Then we shift the context window to
+append index and record it. We can just decode all the integers to strings and
+print them out. These are some example samples, and you can see that the model
+now works much better. The words here are much more word-like or name-like, so
+we have things like "ham." It started to sound a little bit more name-like. So
+we're definitely making progress, but we can still improve on this model quite
+a lot.

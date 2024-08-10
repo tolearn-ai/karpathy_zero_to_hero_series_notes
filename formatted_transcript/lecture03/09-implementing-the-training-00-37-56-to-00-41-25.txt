@@ -1,0 +1,41 @@
+Okay, so let's now set up the training of this neural net. We have the forward
+pass. We don't need these, because then we have that loss is equal to f dot
+cross entropy. That's the forward pass. Then we need the backward pass. First
+we want to set the gradients to be 0. So for p in parameters, we want to make
+sure that p dot grad is none, which is the same as setting it to 0 in PyTorch.
+Then loss.backward to populate those gradients. Once we have the gradients, we
+can do the parameter update. So for p in parameters, we want to take all the
+data and we want to nudge it learning rate times p.grad. And then we want to
+repeat this a few times. Let's print the loss here as well. Now this one
+suffice and it will create an error because we also have to go for p in
+parameters and we have to make sure that p.requiresGrad is set to true in
+PyTorch. And this should just work. Okay, so we started off with a loss of 17
+and we're decreasing it. Let's run longer and you see how the loss decreases a
+lot here. So if we just run for a thousand times, we get a very very low loss
+and that means that we're making very good predictions.
+
+Now the reason that this is so straightforward right now is because we're only
+overfitting 32 examples. We only have 32 examples of the first five words, and
+therefore it's very easy to make this neural net fit only these 32 examples
+because we have 3,400 parameters and only 32 examples. So we're doing what's
+called overfitting a single batch of the data and getting a very low loss and
+good predictions, but that's just because we have so many parameters for so few
+examples, so it's easy to make this be very low. Now we're not able to achieve
+exactly zero, and the reason for that is we can, for example, look at logits
+which are being predicted and we can look at the max along the first dimension.
+In PyTorch, max reports both the actual values that take on the maximum number
+but also the indices of these, and you'll see that the indices are very close
+to the labels but in some cases, they differ. For example, in this very first
+example, the predicted index is 19 but the label is 5. We're not able to make
+the loss be zero, and fundamentally that's because here the very first or the
+zeroth index is the example where "dot dot dot" is supposed to predict "e," but
+you see how "dot dot dot" is also supposed to predict "o" and "i" and then "s"
+as well. Basically, "e," "o," "a," or "s" are all possible outcomes in the
+training set for the exact same input. So we're not able to completely overfit
+and make the loss be exactly zero, but we're getting very close in the cases
+where there's a unique input for a unique output. In those cases, we do what's
+called overfit and we basically get the exact same and the exact correct
+result.
+
+So now all we have to do is make sure that we read in the full data set and
+optimize the neural net.

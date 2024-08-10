@@ -1,0 +1,24 @@
+So here I have a bunch of code that will create a figure and then we're going
+to visualize the embeddings that were trained by the neural net on these
+characters because right now the embedding size is just two so we can visualize
+all the characters with the X and the Y coordinates as the two embedding
+locations for each of these characters. And so here are the X coordinates and
+the Y coordinates which are the columns of C and then for each one I also
+include the text of the little character. So here what we see is actually kind
+of interesting. The network has basically learned to separate out the
+characters and cluster them a little bit. So for example, you see how the
+vowels, A, E, I, O, U, are clustered up here. So what that's telling us is that
+the neural net treats these as very similar, right? Because when they feed into
+the neural net, the embedding for all these characters is very similar. And so
+the neural net thinks that they're very similar and kind of like
+interchangeable. if that makes sense. Then the points that are really far away
+are, for example, Q. Q is kind of treated as an exception, and Q has a very
+special embedding vector, so to speak. Similarly, dot, which is a special
+character, is all the way out here, and a lot of the other letters are sort of
+clustered up here. And so it's kind of interesting that there's a little bit of
+structure here after the training, and it's definitely not random, and these
+embeddings make sense. So we're now going to scale up the embedding size and
+won't be able to visualize it directly, but we expect that because we're
+underfitting and we made this layer much bigger and did not sufficiently
+improve the loss, we're thinking that the constraint to better performance
+right now could be these embedding vectors. So let's make them bigger.

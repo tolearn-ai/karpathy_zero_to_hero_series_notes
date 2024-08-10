@@ -1,0 +1,81 @@
+First, let's build the embedding lookup table C. So we have 27 possible
+characters, and we're going to embed them in a lower dimensional space. In the
+paper, they have 17,000 words, and they embed them in spaces as small
+dimensional as 30. So they crammed 17,000 words into a 30-dimensional space. In
+our case, we have only 27 possible characters, so let's cram them in something
+as small as, to start with, for example, a two-dimensional space. So this
+lookup table will be random numbers, and we'll have 27 rows and we'll have two
+columns. So each one of the 27 characters will have a two-dimensional
+embedding. So that's our matrix C of embeddings in the beginning initialized
+randomly.
+
+Now, before we embed all of the integers inside the input x using this lookup
+table C, let me actually just try to embed a single individual integer like say
+5 so we get a sense of how this works. One way this works, of course, is we can
+just take the C and we can index into row 5, and that gives us a vector from
+the fifth row of C, and this is one way to do it. The other way that I
+presented in the previous lecture is actually seemingly different but actually
+identical. So in the previous lecture, what we did is we took these integers
+and we used the one-hot encoding to first encode them. So f dot one hot, we
+want to encode integer five and we want to tell it that the number of classes
+is 27. So that's the 26th dimensional vector of all zeros except the fifth bit
+is turned on.
+
+Now, this actually doesn't work. The reason is that this input actually must be
+a torch dot tensor. I'm making some of these errors intentionally just so you
+get to see some errors and how to fix them. So this must be a tensor, not an
+int. Fairly straightforward to fix. We get a one-hot vector. The fifth
+dimension is one, and the shape of this is 27. Now notice that, just as I
+briefly alluded to in a previous video, if we take this one-hot vector and we
+multiply it by C, then what would you expect? Well, number one, first you'd
+expect an error because expected scalar type long but found float. So a little
+bit confusing, but the problem here is that one hot, the data type of it is
+long. It's a 64-bit integer, but this is a float tensor. And so PyTorch doesn't
+know how to multiply an int with a float, and that's why we had to explicitly
+cast this to a float so that we can multiply.
+
+Now, the output actually here is identical, and that it's identical because of
+the way the matrix multiplication here works. We have the one-hot vector
+multiplying columns of C, and because of all the zeros, they actually end up
+masking out everything in C except for the fifth row, which is plucked out, and
+so we actually arrive at the same result. That tells you that here we can
+interpret this first piece here, this embedding of the integer, we can either
+think of it as the integer indexing into a lookup table C, but equivalently we
+can also think of this little piece here as a first layer of this bigger neural
+net. This layer here has neurons that have no non-linearity; there's no tanh,
+they're just linear neurons, and their weight matrix is C. Then we are encoding
+integers into one hot and feeding those into a neural net, and this first layer
+basically embeds them.
+
+So those are two equivalent ways of doing the same thing. We're just going to
+index because it's much, much faster, and we're going to discard this
+interpretation of one hot inputs into neural nets, and we're just going to
+index integers and create and use embedding tables.
+
+Now embedding a single integer like five is easy enough. We can simply ask
+PyTorch to retrieve the fifth row of C or the row index five of C. But how do
+we simultaneously embed all of these 32 by 3 integers stored in array x?
+Luckily, PyTorch indexing is fairly flexible and quite powerful, so it doesn't
+just work to ask for a single element 5 like this; you can actually index using
+lists. For example, we can get rows 5, 6, and 7, and this will just work like
+this – we can index with a list. It doesn't just have to be a list; it can also
+be actually a tensor of integers, and we can index with that. So this is an
+integer tensor 567, and this will just work as well. In fact, we can also, for
+example, repeat row 7 and retrieve it multiple times, and that same index will
+just get embedded multiple times here.
+
+So here we are indexing with a one-dimensional tensor of integers, but it turns
+out that you can also index with multi-dimensional tensors of integers. Here we
+have a two-dimensional tensor of integers, so we can simply just do C at x, and
+this just works. The shape of this is 32 by 3, which is the original shape.
+Now, for every one of those 32 by 3 integers, we've retrieved the embedding
+vector here.
+
+So basically we have that as an example. The 13th, or example index 13, the
+second dimension, is the integer 1 as an example. So here, if we do C of x,
+which gives us that array, and then we index into 13 by 2 of that array, then
+we get the embedding here. You can verify that C at 1, which is the integer at
+that location, is indeed equal to this. You see they're equal. So basically,
+long story short, PyTorch indexing is awesome, and to embed simultaneously all
+of the integers in x, we can simply do C of x, and that is our embedding, and
+that just works.

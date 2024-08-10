@@ -1,0 +1,8 @@
+why I rewrote everything here and made it a bit more respectable. So here's our
+data set, here's all the parameters that we defined, I'm now using a generator
+to make it reproducible, I clustered all the parameters into a single list of
+parameters so that for example it's easy to count them and see that in total we
+currently have about 3,400 parameters and this is the forward pass as we
+developed it and we arrived at a single number here, the loss, that is
+currently expressing how well this neural network works with the current
+setting of parameters. Now,

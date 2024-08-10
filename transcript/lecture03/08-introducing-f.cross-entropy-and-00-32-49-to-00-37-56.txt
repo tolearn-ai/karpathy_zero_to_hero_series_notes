@@ -1,0 +1,66 @@
+I would like to make it even more respectable. So in particular see these lines
+here where we take the logits and we calculate a loss We're not actually
+reinventing the wheel here. This is just classification and many people use
+classification and that's why there is a functional dot cross entropy function
+in pytorch to calculate this much more efficiently so we could just simply call
+f dot cross entropy and we can pass in the logits and we can pass in the array
+of targets y and this calculates the exact same loss. So in fact we can simply
+put this here and erase these three lines and we're going to get the exact same
+result. Now there are actually many good reasons to prefer f.cross entropy over
+rolling your own implementation like this. I did this for educational reasons
+but you'd never use this in practice. Why is that? Number one when you use
+f.cross entropy, PyTorch will not actually create all these intermediate
+tensors because these are all new tensors in memory and all this is fairly
+inefficient to run like this. Instead PyTorch will cluster up all these
+operations and very often create fused kernels that very efficiently evaluate
+these expressions that are sort of like clustered mathematical operations.
+Number two, the backward pass can be made much more efficient and not just
+because it's a fused kernel but also analytically and and mathematically it's
+often a very much simpler backward pass to implement. We actually saw this with
+micrograd. You see here when we implemented 10h, the forward pass of this
+operation to calculate the 10h was actually a fairly complicated mathematical
+expression. But because it's a clustered mathematical expression, when we did
+the backward pass we didn't individually backward through the exp and the two
+times and the minus one and division etc we just said it's one minus t squared
+and that's a much simpler mathematical expression and we were able to do this
+because we're able to reuse calculations and because we are able to
+mathematically and analytically derive the derivative and often that expression
+simplifies mathematically and so there's much less to implement so not only can
+can it be made more efficient because it runs in a fused kernel but also
+because the expressions can take a much simpler form mathematically. So that's
+number one. Number two, under the hood f dot cross entropy can also be
+significantly more numerically well behaved. Let me show you an example of how
+this works. Suppose we have a logits of negative two three negative three zero
+and five and then we are taking the exponent of it and normalizing it to sum to
+one. So when logits take on these values, everything is well and good and we
+get a nice probability distribution. Now consider what happens when some of
+these logits take on more extreme values and that can happen during
+optimization of a neural network. Suppose that some of these numbers grow very
+negative, like say negative 100, then actually everything will come out fine.
+We still get a probabilities that you know are well behaved and they sum to one
+and everything is great. But because of the way the exp works, if you have very
+positive logits, let's say positive 100 in here, you actually start to run into
+trouble and we get not a number here. And the reason for that is that these
+counts have an inf here. So if you pass in a very negative number to exp, you
+just get a very negative, sorry, not negative, but very small number, very near
+zero, and that's fine. But if you pass in a very positive number, suddenly we
+run out of range in our floating point number that represents these counts. So
+basically we're taking e and we're raising it to the power of 100 and that
+gives us inf because we've run out of dynamic range on this floating point
+number that is count. And so we cannot pass very large logits through this
+expression. Now let me reset these numbers to something reasonable. The way
+PyTorch solved this is that you see how we have a well-behaved result here. It
+turns out that because of the normalization here, you can actually offset
+logits by any arbitrary constant value that you want. So if I add one here, you
+actually get the exact same result. Or if I add two, or if I subtract three,
+any offset will produce the exact same probabilities. So because negative
+numbers are okay but positive numbers can actually overflow this exp what
+pytorch does is it internally calculates the maximum value that occurs in the
+logits and it subtracts it so in this case it would subtract five and so
+therefore the greatest number in logits will become zero and all the other
+numbers will become some negative numbers and then the result of this is always
+well behaved so even if we have a hundred here previously not good but because
+pytorch will subtract 100 this will work. And so there's many good reasons to
+call cross entropy. Number one the forward pass can be much more efficient, the
+backward pass can be much more efficient and also things can be much more
+numerically well behaved.

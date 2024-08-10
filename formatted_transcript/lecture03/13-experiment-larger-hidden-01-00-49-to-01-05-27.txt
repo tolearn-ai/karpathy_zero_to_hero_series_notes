@@ -1,0 +1,44 @@
+So let's come over here and let's increase the size of the neural net. The
+easiest way to do this is we can come here to the hidden layer, which currently
+has 100 neurons, and let's just bump this up. So let's do 300 neurons. And then
+this is also 300 biases. And here we have 300 inputs into the final layer. So
+let's initialize our neural net. We now have 10,000 parameters instead of 3,000
+parameters. And then we're not using this. And then here what I'd like to do is
+I'd like to actually keep track of that. Okay, let's just do this. Let's keep
+stats again. And here when we're keeping track of the loss, let's just also
+keep track of the steps. And let's just have an eye here. And let's train on
+30,000. Or rather say, okay, let's try 30,000. and we are at 0.1 and we should
+be able to run this and optimize the neural net and then here basically I want
+to plt.plot the steps against the loss so these are the X's and the Y's and
+this is the loss function and how it's being optimized. Now you see that
+there's quite a bit of thickness to this and that's because we are optimizing
+over these mini-batches and the mini-batches create a little bit of noise in
+this. Where are we in the def set? We are at 2.5 so we still haven't optimized
+this neural net very well and that's probably because we made it bigger it
+might take longer for this neural net to converge and so let's continue
+training. Yeah let's just continue training. One possibility is that the batch
+size is so low that we just have way too much noise in the training. And we may
+want to increase the batch size so that we have a bit more correct gradient.
+And we're not thrashing too much. And we can actually optimize more properly.
+This will now become meaningless because we've re-initialized these. Yeah, this
+looks not pleasing right now. But there probably is a tiny improvement, but
+it's so hard to tell. Let's go again. 2.52. Let's try to decrease the learning
+rate by a factor of 2. Okay, we're at 2.32. Let's continue training. We
+basically expect to see a lower loss than what we had before because now we
+have a much much bigger model and we were underfitting. So we'd expect that
+increasing the size of the model should help the neural net. 2.32. Okay, so
+that's not happening too well. Now one other concern is that even though we've
+made the 10H layer here, or the hidden layer much, much bigger, it could be
+that the bottleneck of the network right now are these embeddings that are
+two-dimensional. It can be that we're just cramming way too many characters
+into just two dimensions, and the neural net is not able to really use that
+space effectively. And that is sort of like the bottleneck to our network's
+performance. Okay, 2.23. So just by decreasing the learning rate, I was able to
+make quite a bit of progress. Let's run this one more time. And then evaluate
+the training and the dev loss. Now one more thing after training that I'd like
+to do is I'd like to visualize the embedding vectors for these characters
+before we scale up the embedding size from two because we'd like to make this
+bottleneck potentially go away but once I make this greater than two we won't
+be able to visualize them so here okay we're at 2.23 and 2.24 so we're not
+improving much more and maybe Maybe the bottleneck now is the character
+embedding size, which is.

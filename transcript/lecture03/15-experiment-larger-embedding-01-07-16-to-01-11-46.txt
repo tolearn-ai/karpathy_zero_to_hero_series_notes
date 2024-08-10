@@ -1,0 +1,47 @@
+Okay, so let's scroll up here. And now we don't have two-dimensional
+embeddings. We are going to have, say, 10-dimensional embeddings for each word.
+Then this layer will receive 3 times 10, so 30 inputs will go into the hidden
+layer. Let's also make the hidden layer a bit smaller. So instead of 300, let's
+just do 200 neurons in that hidden layer. so now the total number of elements
+will be slightly bigger at 11,000 and then here we have to be a bit careful
+because okay the learning rate we set to 0.1 here we are hard coding 6 and
+obviously if you're working in production you don't want to be hard coding
+magic numbers but instead of 6 this should now be 30 and let's run for 50,000
+iterations and let me split out the initialization here outside so that when we
+run this cell multiple times it's not going to wipe out our loss. In addition
+to that, here, instead of logging the loss.item, let's do log10. I believe
+that's a function of the loss. And I'll show you why in a second. Let's
+optimize this. Basically I'd like to plot the log loss instead of the loss
+because when you plot the loss many times it can have this hockey stick
+appearance and log squashes it in so it just kind of looks nicer So the x-axis
+is step i and the y-axis will be the loss i and then here this is 30 Ideally,
+we wouldn't be hardcoding these. Okay, so let's look at the loss. Okay, it's
+again very thick because the mini-batch size is very small, but the total loss
+over the training set is 2.3, and the test or the def set is 2.38 as well. So,
+so far, so good. Let's try to now decrease the learning rate by a factor of 10
+and train for another 50,000 iterations. we'd hope that we would be able to
+beat 2.32. But again, we're just kind of like doing this very haphazardly. So I
+don't actually have confidence that our learning rate is set very well, that
+our learning rate decay, which we just do at random, is set very well. And so
+the optimization here is kind of suspect, to be honest. And this is not how you
+would do it typically in production. In production, you would create parameters
+or hyperparameters out of all these settings, and then you would run lots of
+experiments and see whichever ones are working well for you. Okay, so we have
+2.17 now and 2.2. Okay, so you see how the training and the validation
+performance are starting to slightly slowly depart. So maybe we're getting the
+sense that the neural net is getting good enough or that number of parameters
+is large enough that we are slowly starting to overfit. Let's maybe run one
+more iteration of this and see where we get. But yeah, basically, you would be
+running lots of experiments and then you are slowly scrutinizing whichever ones
+give you the best dev performance. And then once you find all the
+hyperparameters that make your dev performance good, you take that model and
+you evaluate the test set performance a single time. And that's the number that
+you report in your paper or wherever else you want to talk about and brag about
+your model So let's then rerun the plot and rerun the train and dev And because
+we're getting lower loss now, it is the case that the embedding size of these
+was holding us back very likely Okay, so 2.16, 2.19 is what we're roughly
+getting So there's many ways to go from here. We can continue tuning the
+optimization. We can continue, for example, playing with the size of the neural
+net. Or we can increase the number of words or characters in our case that we
+are taking as an input. So instead of just three characters, we could be taking
+more characters than as an input. And that could further improve the loss.

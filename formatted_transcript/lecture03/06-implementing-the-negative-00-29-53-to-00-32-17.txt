@@ -1,0 +1,28 @@
+Now exactly as we saw in the previous video, we want to take these logits and
+we want to first exponentiate them to get our fake counts and then we want to
+normalize them into a probability. So prob is counts divide and now counts dot
+sum along the first dimension and keep them as true exactly as in the previous
+video. And so prob.shape now is 32 by 27 and you'll see that every row of prob
+sums to one so it's normalized. So that gives us the probabilities. Now of
+course we have the actual letter that comes next and that comes from this array
+y which we created during the dataset creation. So y is this last piece here
+which is the identity of the next character in the sequence that we'd like to
+now predict. So what we'd like to do now is just as in the previous video we'd
+like to index into the rows of prob and in each row we'd like to pluck out the
+probability assigned to the correct character as given here. So first we have
+torch.arrange which is kind of like an iterator over numbers from 0 to 31 and
+then we can index into prob in the following way. prob in torch.arrange which
+iterates the rows and then in each row we'd like to grab this column as given
+by y. So this gives the current probabilities as assigned by this neural
+network with this setting of its weights to the correct character in the
+sequence. And you can see here that this looks okay for some of these
+characters like this is basically 0.2 but it doesn't look very good at all for
+many other characters like this is 0.0701 probability and so the network thinks
+that some of these are extremely unlikely. But of course we haven't trained the
+neural network yet so this will improve and ideally all of these numbers here
+of course are 1 because then we are correctly predicting the next character.
+Now just as in the previous video we want to take these probabilities, we want
+to look at the log probability and then we want to look at the average log
+probability and the negative of it to create the negative log likelihood loss.
+So the loss here is 17 and this is the loss that we'd like to minimize to get
+the network to predict the correct character in the sequence.

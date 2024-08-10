@@ -1,0 +1,24 @@
+Hi everyone. Today we are continuing our implementation of MakeMore. Now in the
+last lecture we implemented the bigram language model and we implemented it
+both using counts and also using a super simple neural network that has a
+single linear layer. Now this is the Jupyter notebook that we built out last
+lecture and we saw that the way we approached this is that we looked at only
+the single previous character and we predicted the distribution for the
+character that would go next in the sequence. And we did that by taking counts
+and normalizing them into probabilities so that each row here sums to one. Now
+this is all well and good if you only have one character of previous context.
+And this works and it's approachable. The problem with this model, of course,
+is that the predictions from this model are not very good because you only take
+one character of context. So the model didn't produce very name-like sounding
+things. Now, the problem with this approach, though, is that if we are to take
+more context into account when predicting the next character in a sequence,
+things quickly blow up. And this table, the size of this table, grows. And in
+fact, it grows exponentially with the length of the context. Because if we only
+take a single character at a time, that's 27 possibilities of context. But if
+we take two characters in the past and try to predict the third one, suddenly
+the number of rows in this matrix, you can look at it that way, is 27 times 27.
+So there's 729 possibilities for what could have come in the context. If we
+take three characters as the context, suddenly we have 20,000 possibilities of
+context. And so that's just way too many rows of this matrix. It's way too few
+counts for each possibility. And the whole thing just kind of explodes and
+doesn't work very well.

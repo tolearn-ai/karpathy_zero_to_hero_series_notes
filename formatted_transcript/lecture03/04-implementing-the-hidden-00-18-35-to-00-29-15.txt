@@ -1,0 +1,130 @@
+Now let's construct this layer here, the hidden layer. So we have that w1 as
+I'll call it, are these weights which we will initialize randomly. Now the
+number of inputs to this layer is going to be 3 times 2, right, because we have
+two-dimensional embeddings and we have three of them. So the number of inputs
+is 6 and the number of neurons in this layer is a variable up to us. Let's use
+100 neurons as an example and then biases will be also initialized randomly as
+an example and we just need 100 of them. Now the problem with this is we can't
+simply... normally we would take the input, in this case that's embedding, and
+we'd like to multiply it with these weights and then we would like to add the
+bias. This is roughly what we want to do but the problem here is that these
+embeddings are stacked up in the dimensions of this input tensor. So this will
+not work, this matrix multiplication, because this is a shape 32 by 3 by 2, and
+I can't multiply that by 6 by 100. So somehow we need to concatenate these
+inputs here together so that we can do something along these lines, which
+currently does not work. So how do we transform this 32 by 3 by 2 into a 32 by
+6 so that we can actually perform this multiplication over here?
+
+I'd like to show you that there are usually many ways of implementing what
+you'd like to do in Torch. And some of them will be faster, better, shorter,
+etc. And that's because Torch is a very large library and it's got lots and
+lots of functions. So if we just go to the documentation and click on Torch,
+you'll see that my slider here is very tiny and that's because there are so
+many functions that you can call on these tensors to transform them, create
+them, multiply them, add them, perform all kinds of different operations on
+them. And so this is kind of like the space of possibility, if you will. Now,
+one of the things that you can do is we can control here, control F for
+concatenate. And we see that there's a function, torch.cat, short for
+concatenate. And this concatenate is a given sequence of tensors in a given
+dimension. And these tensors must have the same shape, etc. So we can use the
+concatenate operation to, in a naive way, concatenate these three embeddings
+for each input. So in this case, we have m of the shape. And really what we
+want to do is we want to retrieve these three parts and concatenate them. So we
+want to grab all the examples. We want to grab first the zeroth index and then
+all of this. So this plucks out the 32 by 2 embeddings of just the first word
+here. And so basically we want this guy, we want the first dimension, and we
+want the second dimension. And these are the three pieces individually and then
+we want to treat this as a sequence and we want to torch.cat on that sequence
+so this is the list torch.cat takes a sequence of tensors and then we have to
+tell it along which dimension to concatenate so in this case all these are 32
+by 2 and we want to concatenate not across dimension 0 but across dimension 1
+so passing in 1 gives us a result that the shape of this is 32 by 6 exactly as
+we'd like. So that basically took 32 and squashed these by concatenating them
+into 32 by 6.
+
+Now this is kind of ugly because this code would not generalize if we want to
+later change the block size. Right now we have three inputs, three words, but
+what if we had five? Then here we would have to change the code because I'm
+indexing directly. Well Torch comes to rescue again because there turns out to
+be a function called unbind and it removes a tensor dimension so it removes the
+tensor dimension returns a tuple of all slices along a given dimension without
+it so this is exactly what we need and basically when we call torch.unbind
+torch.unbind of m and pass in dimension index 1, this gives us a list of
+tensors exactly equivalent to this. So running this gives us a line 3, and it's
+exactly this list. And so we can call torch.cat on it, and along the first
+dimension. And this works, and this shape is the same. But now this is, it
+doesn't matter if we have block size 3 or five or ten this will just work. So
+this is one way to do it but it turns out that in this case there's actually a
+significantly better and more efficient way and this gives me an opportunity to
+hint at some of the internals of TorchJobTensor.
+
+So let's create an array here of elements from 0 to 17 and the shape of this is
+just 18. It's a single vector of 18 numbers. It turns out that we can very
+quickly re-represent this as different sized n-dimensional tensors. We do this
+by calling a view, and we can say that actually this is not a single vector of
+18. This is a 2 by 9 tensor, or alternatively this is a 9 by 2 tensor, or this
+is actually a 3 by 3 by 2 tensor. As long as the total number of elements here
+multiply to be the same, this will just work. And in PyTorch this operation
+calling dot view is extremely efficient and the reason for that is that in each
+tensor there's something called the underlying storage and the storage is just
+the numbers always as a one-dimensional vector and this is how this tensor is
+represented in the computer memory it's always a one-dimensional vector but
+when we call dot view we are manipulating some of attributes of that tensor
+that dictate how this one-dimensional sequence is interpreted to be an
+n-dimensional tensor.
+
+And so what's happening here is that no memory is being changed, copied, moved,
+or created when we call dot view. The storage is identical, but when you call
+dot view, some of the internal attributes of the view of this tensor are being
+manipulated and changed. In particular, there's something called storage
+offset, strides, and shapes, and those are manipulated so that this
+one-dimensional sequence of bytes is seen as different n-dimensional arrays.
+There's a blog post here from Eric called PyTorch Internals where he goes into
+some of this with respect to tensor and how the view of a tensor is
+represented. And this is really just like a logical construct of representing
+the physical memory. And so this is a pretty good blog post that you can go
+into. I might also create an entire video on the internals of TorchTensor know
+how this works. For here we just note that this is an extremely efficient
+operation and if I delete this and come back to our emb we see that the shape
+of our emb is 32 by 3 by 2 but we can simply ask for PyTorch to view this
+instead as a 32 by 6. And the way this gets flattened into a 32 by 6 array just
+happens that these two get stacked up in a single row. And so that's basically
+the concatenation operation that we're after.
+
+And you can verify that this actually gives the exact same result as what we
+had before. So this is an element y equals, and you can see that all the
+elements of these two tensors are the same. And so we get the exact same
+result. So long story short, we can actually just come here. And if we just
+view this as a 32 by 6 instead, then this multiplication will work and give us
+the hidden states that we're after. So if this is h, then h-shape is now the
+100-dimensional activations for every one of our 32 examples. And this gives
+the desired result. Let me do two things here. Number one, let's not use 32. We
+can, for example, do something like m.shape at 0 so that we don't hard-code
+these numbers. and this would work for any size of this m or alternatively we
+can also do negative 1. When we do negative 1, PyTorch will infer what this
+should be because the number of elements must be the same and we're saying that
+this is 6, PyTorch will derive that this must be 32 or whatever else it is if m
+is of different size.
+
+The other thing is here one more thing I'd like to point out is here when we do
+the concatenation this actually is much less efficient because this
+concatenation would create a whole new tensor with a whole new storage so new
+memory is being created because there's no way to concatenate tensors just by
+manipulating the view attributes so this is inefficient and creates all kinds
+of new memory so let me delete this now we don't need this and here to
+calculate H we want to also dot 10H of this to get our H. So these are now
+numbers between negative 1 and 1 because of the 10H and we have that the shape
+is 32 by 100 and that is basically this hidden layer of activations here for
+every one of our 32 examples. Now there's one more thing I've lost over that we
+have to be very careful with and that's this plus here. In particular we want
+to make sure that the broadcasting will do what we like. The shape of this is
+32 by 100 and the one's shape is 100. So we see that the addition here will
+broadcast these two and in particular we have 32 by 100 broadcasting to 100. So
+broadcasting will align on the right, create a fake dimension here, so this
+will become a 1 by 100 row vector and then it will copy vertically for every
+one of these rows of 32 and do an element-wise addition. So in this case the
+correcting will be happening because the same bias vector will be added to all
+the rows of this matrix. So that is correct, that's what we'd like and it's
+always good practice to just make sure so that you don't treat yourself in the
+foot.
+`

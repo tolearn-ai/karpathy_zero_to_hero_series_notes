@@ -1,0 +1,50 @@
+I started a brand new notebook for this lecture. We are importing PyTorch and
+we are importing Matplotlib so we can create figures. Then I am reading all the
+names into a list of words like I did before and I'm showing the first eight
+right here. Keep in mind that we have a 32,000 in total, these are just the
+first eight. And then here I'm building out the vocabulary of characters and
+all the mappings from the characters as strings to integers and vice versa.
+
+Now the first thing we want to do is we want to compile the dataset for the
+neural network. And I had to rewrite this code. I'll show you in a second what
+it looks like. So this is the code that I created for the dataset creation. So
+let me first run it, and then I'll briefly explain how this works.
+
+So first, we're going to define something called block size. And this is
+basically the context length of how many characters do we take to predict the
+next one. So here in this example, we're taking three characters to predict the
+fourth one. So we have a block size of three. That's the size of the block that
+supports the prediction.
+
+Then here I'm building out the x and y. The x are the input to the neural net
+and the y are the labels for each example inside x. Then I'm erasing over the
+first five words. I'm doing first five just for efficiency while we are
+developing all the code. But then later we are going to come here and erase
+this so that we use the entire training set.
+
+So here I'm printing the word Emma and here I'm basically showing the examples
+that we can generate, the five examples that we can generate out of the single
+sort of word Emma. So when we are given the context of just dot dot dot the
+first character in a sequence is E, in this context the label is M, when the
+context is this the label is M and so forth.
+
+And so the way I build this out is first I start with a padded context of just
+zero tokens. Then I iterate over all the characters. I get the character in the
+sequence. And I basically build out the array y of this current character and
+the array x, which stores the current running context. And then here, see, I
+print everything. And here I crop the context and enter the new character in
+the sequence. So this is kind of like a rolling window of context.
+
+Now we can change the block size here to, for example, 4, and in that case, we
+would be predicting the fifth character given the previous 4. Or it can be 5,
+and then it would look like this. Or it can be, say, 10, and then it would look
+something like this. We're taking 10 characters to predict the 11th one, and
+we're always padding with dots.
+
+So let me bring this back to 3, just so that we have what we have here in the
+paper. And finally the dataset right now looks as follows. From these five
+words we have created a dataset of 32 examples and each input to the neural net
+is three integers and we have a label that is also an integer, y. So x looks
+like this. These are the individual examples and then y are the labels. So
+given this, let's now write a neural network that takes these x's and predicts
+the y's.

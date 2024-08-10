@@ -1,0 +1,121 @@
+So that's why today we're going to move on to this bullet point here. And we're
+going to implement a multilayer perceptron model to predict the next character
+in a sequence. And this modeling approach that we're going to adopt follows
+this paper Benjou et al. 2003. So I have the paper pulled up here.
+
+Now, this isn't the very first paper that proposed the use of multilayer
+perceptrons or neural networks to predict the next character or token in a
+sequence, but it's definitely one that was very influential around that time.
+It is very often cited to stand in for this idea, and I think it's a very nice
+write-up. And so this is the paper that we're going to first look at and then
+implement.
+
+Now, this paper has 19 pages, so we don't have time to go into the full detail
+of this paper, but I invite you to read it. It's very readable, interesting,
+and has a lot of interesting ideas in it as well. In the introduction, they
+describe the exact same problem I just described, and then to address it, they
+propose the following model.
+
+Now keep in mind that we are building a character level language model, so
+we're working on the level of characters. In this paper, they have a vocabulary
+of 17,000 possible words, and they instead build a word level language model.
+But we're going to still stick with the characters, but we'll take the same
+modeling approach.
+
+Now what they do is basically they propose to take every one of these words,
+17,000 words, and they're going to associate to each word a, say,
+30-dimensional feature vector. So every word is now embedded into a
+30-dimensional space. You can think of it that way. So we have 17,000 points or
+vectors in a 30-dimensional space. And you might imagine that's very crowded.
+That's a lot of points for a very small space.
+
+Now, in the beginning, these words are initialized completely randomly. So
+they're spread out at random. But then we're going to tune these embeddings of
+these words using that propagation. So during the course of training of this
+neural network, these points or vectors are going to basically move around in
+this space. And you might imagine that, for example, words that have very
+similar meanings or that are indeed synonyms of each other might end up in a
+very similar part of the space. And conversely, words that mean very different
+things would go somewhere else in the space.
+
+Now, the modeling approach otherwise is identical to ours. They are using a
+multilayer neural network to predict the next word given the previous words,
+and to train the neural network they are maximizing the log likelihood of the
+training data just like we did. So the modeling approach itself is identical.
+
+Now here they have a concrete example of this intuition. Why does it work?
+Basically, suppose that for example you are trying to predict "a dog was
+running in a blank". Now suppose that the exact phrase "a dog was running in a"
+has never occurred in the training data. And here you are at sort of test time
+later when the model is deployed somewhere and it's trying to make a sentence
+and it's saying, "dog was running in a blank". And because it's never
+encountered this exact phrase in the training set, you're out of distribution,
+as we say. You don't have fundamentally any reason to suspect what might come
+next.
+
+But this approach actually allows you to get around that because maybe you
+didn't see the exact phrase "a dog was running in a something" but maybe you've
+seen similar phrases, maybe you've seen the phrase "the dog was running in a
+blank" and maybe your network has learned that "a" and "the" are like
+frequently are interchangeable with each other and so maybe it took the
+embedding for "a" and the embedding for "the" and it actually put them like
+nearby each other in the space and so you can transfer knowledge through that
+embedding and you can generalize in that way.
+
+Similarly, the network could know that cats and dogs are animals and they
+co-occur in lots of very similar contexts and so even though you haven't seen
+this exact phrase or if you haven't seen exactly "walking" or "running" you can
+through the embedding space transfer knowledge and you can generalize to novel
+scenarios.
+
+So let's now scroll down to the diagram of the neural network. They have a nice
+diagram here and in this example we are taking three previous words and we are
+trying to predict the fourth word in a sequence.
+
+Now these three previous words, as I mentioned, we have a vocabulary of 17,000
+possible words. So every one of these basically are the index of the incoming
+word and because there are 17,000 words this is an integer between 0 and
+16,999. Now there's also a lookup table that they call C. This lookup table is
+a matrix that is 17,000 by say 30. And basically what we're doing here is we're
+treating this as a lookup table. And so every index is plucking out a row of
+this embedding matrix so that each index is converted to the 30 dimensional
+vector that corresponds to the embedding vector for that word.
+
+So here we have the input layer of 30 neurons for three words making up 90
+neurons in total. And here they're saying that this matrix C is shared across
+all the words. So we're always indexing into the same matrix C over and over
+for each one of these words.
+
+Next up is the hidden layer of this neural network. The size of this hidden
+neural layer of this neural net is a hyperparameter. So we use the word
+hyperparameter when it's kind of like a design choice up to the designer of the
+neural net and this can be as large as you'd like or as small as you'd like. So
+for example, the size could be 100. And we are going to go over multiple
+choices of the size of this hidden layer, and we're going to evaluate how well
+they work.
+
+So say there were 100 neurons here, all of them would be fully connected to the
+90 words or 90 numbers that make up these three words. So this is a fully
+connected layer, then there's a 10-inch long linearity, and then there's this
+output layer, and because there are 17,000 possible words that could come next,
+this layer has 17,000 neurons and all of them are fully connected to all of
+these neurons in the hidden layer. So there's a lot of parameters here because
+there's a lot of words. So most computation is here. This is the expensive
+layer.
+
+Now there are 17,000 logits here. So on top of there, we have the softmax
+layer, which we've seen in our previous video as well. So every one of these
+logits is exponentiated. and then everything is normalized to sum to one so
+that we have a nice probability distribution for the next word in the sequence.
+
+Now, of course, during training, we actually have the label. We have the
+identity of the next word in the sequence. That word or its index is used to
+pluck out the probability of that word and then we are maximizing the
+probability of that word with respect to the parameters of this neural net. So
+the parameters are the weights and biases of this output layer, the weights and
+biases of the hidden layer, and the embedding lookup table C. And all of that
+is optimized using backpropagation.
+
+And these dashed arrows, ignore those. That represents a variation of a neural
+net that we are not going to explore in this video. So that's the setup, and
+now let's implement it. Okay, so...

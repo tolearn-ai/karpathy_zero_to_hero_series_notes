@@ -1,0 +1,5 @@
+finally let's create the final layer here so let's create w2 and b2 the input
+now is 100 and the output number of neurons will be for us 27 because we have
+27 possible characters that come next so the biases will be 27 as well so
+therefore the logits which are the outputs of this neural net are going to be H
+multiplied by W2 plus B2. Logits.shape is 32 by 27 and the logits look good.

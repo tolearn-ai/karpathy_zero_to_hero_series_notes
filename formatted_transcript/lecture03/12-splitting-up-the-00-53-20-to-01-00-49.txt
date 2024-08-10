@@ -1,0 +1,82 @@
+Now, there's something we have to be careful with. I said that we have a better
+model because we are achieving a lower loss, 2.3, much lower than 2.45 with the
+bigram model previously. Now, that's not exactly true. And the reason that's
+not true is that this is actually a fairly small model, but these models can
+get larger and larger if you keep adding neurons and parameters. So you can
+imagine that we don't potentially have 1,000 parameters. We could have 10,000
+or 100,000 or millions of parameters. And as the capacity of the neural network
+grows, it becomes more and more capable of overfitting your training set. What
+that means is that the loss on the training set, on the data that you're
+training on, will become very, very low, as low as zero. But all that the model
+is doing is memorizing your training set verbatim. So if you take that model
+and it looks like it's working really well, but you try to sample from it, you
+will basically only get examples exactly as they are in the training set. You
+won't get any new data. In addition to that, if you try to evaluate the loss on
+some withheld names or other words, you will actually see that the loss on
+those can be very high. And so basically, it's not a good model.
+
+So the standard in the field is to split up your data set into three splits, as
+we call them. We have the training split, the dev split or the validation
+split, and the test split. So training split, test or, sorry, dev or validation
+split, and test split. And typically, this would be, say, 80% of your data set.
+This could be 10%, and this 10%, roughly. So you have these three splits of the
+data. Now, these 80% of your training of the data set, the training set, is
+used to optimize the parameters of the model, just like we're doing here using
+gradient descent. These 10% of the examples, the dev or validation split,
+they're used for development over all the hyperparameters of your model. So
+hyperparameters are, for example, the size of this hidden layer, the size of
+the embedding. So this is a hundred or a two for us, but we could try different
+things. The strength of the regularization, which we aren't using yet so far.
+So there's lots of different hyperparameters and settings that go into defining
+a neural net. And you can try many different variations of them and see
+whichever one works best on your validation split. So this is used to train the
+parameters, this is used to train the hyperparameters, and test split is used
+to evaluate basically the performance of the model at the end. So we're only
+evaluating the loss on the test split very, very sparingly and very few times,
+because every single time you evaluate your test loss and you learn something
+from it, basically starting to also train on the test split. So you are only
+allowed to test the loss on the test set very very few times otherwise you risk
+overfitting to it as well as you experiment on your model.
+
+So let's also split up our training data into train, dev and test and then we
+are going to train on train and only evaluate on test very very sparingly. Okay
+so here we go. Here is where we took all the words and put them into x and y
+tensors. So instead let me create a new cell here and let me just copy paste
+some code here because I don't think it's that complex but we're going to try
+to save a little bit of time. I'm converting this to be a function now and this
+function takes some list of words and builds the arrays x and y for those words
+only. and then here I am shuffling up all the words so these are the input
+words that we get we are randomly shuffling them all up and then we're going to
+set n1 to be the number of examples that's 80% of the words and n2 to be 90% of
+the words so basically if length of words is 32,000 n1 is well sorry I should
+probably run this N1 is 25,000 and N2 is 28,000. And so here we see that I'm
+calling buildDataset to build a training set x and y by indexing into up to N1.
+So we're going to have only 25,000 training words. And then we're going to have
+roughly N2 minus N1, 3,000 validation examples or dev examples. and we're going
+to have one of words basically minus n2 or 3,204 examples here for the test
+set. So now we have x's and y's for all those three splits. Oh yeah, I'm
+printing their size here inside the function as well. but here we don't have
+words but these are already the individual examples made from those words so
+let's now scroll down here and the data set now for training is more like this
+and then when we reset the network when we're training we're only going to be
+training using x train x train and y train so that's the only thing we're
+training on let's see where we are on the single batch let's now train maybe a
+few more steps training of neural networks can take a while usually you don't
+do it inline you launch a bunch of jobs and you wait for them to finish. It can
+take multiple days and so on. Luckily, this is a very small network. Okay, so
+the loss is pretty good. Oh, we accidentally used a learning rate that is way
+too low. So let me actually come back. We used the decay learning rate of 0.01.
+So this will train much faster. and then here when we evaluate let's use the
+dev set here x dev and y dev to evaluate the loss okay and let's now decay the
+learning rate and only do say 10 000 examples and let's evaluate the dev loss
+once here okay so we're getting about 2.3 on dev and so the Network of Animals
+training did not see these dev examples, it hasn't optimized on them, and yet
+when we evaluate the loss on these devs we actually get a pretty decent loss.
+And so we can also look at what the loss is on all of training set. And so we
+see that the training and the dev loss are about equal, so we're not
+overfitting. This This model is not powerful enough to just be purely
+memorizing the data. And so far, we are what's called underfitting because the
+training loss and the dev or test losses are roughly equal. So what that
+typically means is that our network is very tiny, very small. And we expect to
+make performance improvements by scaling up the size of this neural net. So
+let's do that now.
