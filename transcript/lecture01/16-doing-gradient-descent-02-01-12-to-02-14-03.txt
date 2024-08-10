@@ -1,0 +1,132 @@
+now we'll be able to change them. If we recalculate the loss here, we see that
+unfortunately we have slightly different predictions and slightly different
+loss. But that's okay. Okay, so we see that this neuron's gradient is slightly
+negative. We can also look at its data right now, which is 0.85. So this is the
+current value of this neuron, and this is its gradient on the loss. So what we
+want to do now is we want to iterate for every p in n dot parameters so for all
+the 41 parameters of this neural net, we actually want to change p dot data
+slightly according to the gradient information. Okay, so dot dot dot to do
+here, but this will be basically a tiny update in this gradient descent scheme.
+And in gradient descent we are thinking of the gradient as a vector pointing in
+the direction of increased loss and so in gradient descent we are modifying p
+dot data by a small step size in the direction of the gradient so the step size
+as an example could be like a very small number like 0.01 is the step size
+times p dot grad right but we have to think through some of the signs here so
+in particular working with this specific example here we see that if we just
+left it like this then this neuron's value would be currently increased by a
+tiny amount of the gradient the gradient is negative so this value of this
+neuron would go slightly down it would become like 0.8, you know, 4 or
+something like that. But if this neuron's value goes lower, that would actually
+increase the loss. That's because the derivative of this neuron is negative. So
+increasing this makes the loss go down. So increasing it is what we want to do
+instead of decreasing it. So basically what we're missing here is we're
+actually missing a negative sign. and again this other interpretation and
+that's because we want to minimize the loss we don't want to maximize the loss
+we want to decrease it and the other interpretation as i mentioned is you can
+think of the gradient vector so basically just the vector of all the gradients
+as pointing in the direction of increasing the loss but then we want to
+decrease it so we actually want to go in the opposite direction and so you can
+convince yourself that this sort of like that's the right thing here with the
+negative because we want to minimize the loss. So if we notch all the
+parameters by a tiny amount, then we'll see that this data will have changed a
+little bit. So now this neuron is a tiny amount greater value. So 0.854 went to
+0.857. And that's a good thing because slightly increasing this neuron data
+makes the loss go down according to the gradient. And so the correcting has
+happened sign wise. And so now what we would expect of course, is that because
+we've changed all these parameters, we expect that the loss should have gone
+down a bit. So we want to reevaluate the loss. Let me basically, this is just a
+data definition that hasn't changed, but the forward pass here of the network,
+we can recalculate. And actually let me do it outside here so that we can
+compare the two loss values. So here if I recalculate the loss we'd expect the
+new loss now to be slightly lower than this number. So hopefully what we're
+getting now is a tiny bit lower than 4.84, 4.36. Okay and remember the way
+we've arranged this is that low loss means that our predictions are matching
+the targets. so our predictions now are probably slightly closer to the targets
+and now all we have to do is we have to iterate this process so again we've
+done the forward pass and this is the loss now we can loss that backward let me
+take these out and we can do a step size and now we should have a slightly
+lower loss 4.36 goes to 3.9 and okay so we've done the forward pass, here's the
+backward pass, nudge. And now the loss is 3.66, 3.47. And you get the idea. We
+just continue doing this. And this is gradient descent. We're just iteratively
+doing forward pass, backward pass, update. Forward pass, backward pass, update.
+And the neural net is improving its predictions. So here if we look at yPred
+now, we see that this value should be getting closer to one. So this value
+should be getting more positive, these should be getting more negative, and
+this one should be also getting more positive. So if we just iterate this a few
+more times, actually we may be able to afford to go a bit faster. Let's try a
+slightly higher learning rate. Oops, okay, there we go. So now we're at 0.31.
+If you go too fast, by the way, if you try to make it too big of a step, you
+may actually overstep. It's overconfidence. Because again, remember, we don't
+actually know exactly about the loss function. The loss function has all kinds
+of structure. And we only know about the very local dependence of all these
+parameters on the loss. But if we step too far, we may step into a part of the
+loss that is completely different. and that can destabilize training and make
+your loss actually blow up even. So the loss is now 0.04. So actually, the
+predictions should be really quite close. Let's take a look. So you see how
+this is almost 1, almost negative 1, almost 1. We can continue going. So, yep,
+backward, update. Oops, there we go. So we went way too fast, and we actually
+overstepped. so we got too eager, where are we now? oops, okay, 7 in negative
+9, so this is very very low loss, and the predictions are basically perfect, so
+somehow we basically we were doing way too big updates and we briefly exploded,
+but then somehow we ended up getting into a really good spot, so usually this
+learning rate and the tuning of it is a subtle art, you want to set your
+learning rate If it's too low, you're going to take way too long to converge.
+But if it's too high, the whole thing gets unstable, and you might actually
+even explode the loss, depending on your loss function. So finding the step
+size to be just right, it's a pretty subtle art sometimes when you're using
+sort of vanilla gradient descent. But we happen to get into a good spot. We can
+look at n.parameters. So this is the setting of weights and biases that makes
+our network predict the desired targets very, very close. And basically, we've
+successfully trained a neural net. Okay, let's make this a tiny bit more
+respectable and implement an actual training loop and what that looks like. So
+this is the data definition that stays. This is the forward pass. So for k in
+range, we're going to take a bunch of steps. First, we do the forward pass, we
+validate the loss. Let's reinitialize the neural net from scratch. And here's
+the data. And we first do forward pass, then we do the backward pass. And then
+we do an update. gradient descent. And then we should be able to iterate this
+and we should be able to print the current step, the current loss. Let's just
+print the sort of number of the loss and that should be it. And then the
+learning rate 0.01 is a little too small. 0.1 we saw is like a little bit
+dangerous with UI. let's go somewhere in between and we'll optimize this for
+not 10 steps but let's go for say 20 steps let me erase all of this junk and
+let's run the optimization and you see how we've actually converged slower in a
+more controlled manner and and got to a loss that is very low. So I expect
+YPred to be quite good. There we go. And that's it. Okay, so this is kind of
+embarrassing, but we actually have a really terrible bug in here. And it's a
+subtle bug, and it's a very common bug. And I can't believe I've done it for
+the 20th time in my life, especially on camera. and I could have reshot the
+whole thing but I think it's pretty funny and you get to appreciate a bit what
+working with neural nets maybe is like sometimes we are guilty of a common bug
+I've actually tweeted the most common neural net mistakes a long time ago now
+and I'm not really going to explain any of these except for we are guilty of
+number three you forgot to zero grad before dot backward what is that?
+basically what's happening, and it's a subtle bug and I'm not sure if you saw
+it, is that all of these weights here have a dot data and a dot grad. And the
+dot grad starts at zero. And then we do backward and we fill in the gradients.
+And then we do an update on the data, but we don't flush the grad. It stays
+there. So when we do the second forward pass and we do backward again, remember
+that all the backward operations do a plus equals on the grad. And so these
+gradients just add up and they never get reset to zero. So basically we didn't
+zero grad. So here's how we zero grad before backward. We need to iterate over
+all the parameters and we need to make sure that p.grad is set to zero. We need
+to reset it to zero just like it is in the constructor. so remember all the way
+here for all these value nodes grad is reset to zero and then all these
+backward passes do a plus equals from that grad but we need to make sure that
+we reset these graphs to zero so that when we do backward all of them start at
+zero and the actual backward pass accumulates the loss derivatives into the
+grads so this is zero grad in pytorch and we will get a slightly different
+optimization. Let's reset the neural net. The data is the same. This is now, I
+think, correct. And we get a much more slower descent. We still end up with
+pretty good results and we can continue this a bit more to get down lower and
+lower and lower. Yeah. so the only reason that the previous thing worked it's
+extremely buggy the only reason that worked is that this is a very very simple
+problem and it's very easy for this neural net to fit this data and so the
+grads ended up accumulating and it effectively gave us a massive step size and
+it made us converge extremely fast but basically now we have to do more steps
+to get to very low values of loss and get y-pret to be really good. We can try
+to step a bit greater. Yeah, we're going to get closer and closer to 1, minus
+1, and 1. So working with neural nets is sometimes tricky because you may have
+lots of bugs in the code and your network might actually work, just like ours
+worked. but chances are is that if we had a more complex problem then actually
+this bug would have made us not optimize the loss very well and we were only
+able to get away with it because the problem is very simple

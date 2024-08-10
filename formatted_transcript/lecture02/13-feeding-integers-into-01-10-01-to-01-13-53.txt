@@ -1,0 +1,53 @@
+Okay, now we want to think through how we're going to feed in these examples
+into a neural network. Now, it's not quite as straightforward as plugging it
+in, because these examples right now are integers. So there's like a 0, 5, or
+13. It gives us the index of the character. And you can't just plug an integer
+index into a neural net. These neural nets are sort of made up of these
+neurons, and these neurons have weights. And as you saw in micrograd, these
+weights act multiplicatively on the inputs, wx plus b, there's 10hs and so on.
+And so it doesn't really make sense to make an input neuron take on integer
+values that you feed in and then multiply on with weights.
+
+So instead, a common way of encoding integers is what's called one-hot
+encoding. In one-hot encoding, we take an integer like 13, and we create a
+vector that is all zeros except for the 13th dimension, which we turn to one
+and then that vector can feed into a neural net. Now conveniently PyTorch
+actually has something called the one hot function inside torch and then
+functional. It takes a tensor made up of integers. Long is an integer and it
+also takes a number of classes which is how large you want your tensor, your
+vector to be.
+
+So here let's import torch.NN.Functional as f. This is a common way of
+importing it. And then let's do f.onehot and we feed in the integers that we
+want to encode. So we can actually feed in the entire array of x's and we can
+tell it that numclasses is 27. So it doesn't have to try to guess it. It may
+have guessed that it's only 13 and would give us an incorrect result.
+
+So this is the one hot. Let's call this xinc for xencoded. And then we see that
+xencoded.shape is 5 by 27. And we can also visualize it plt.imshow of xinc to
+make it a little bit more clear because this is a little messy. So we see that
+we've encoded all the five examples into vectors. We have five examples, so we
+have five rows, and each row here is now an example into a neural net. And we
+see that the appropriate bit is turned on as a one, and everything else is
+zero.
+
+So here, for example, the zeroth bit is turned on, the fifth bit is turned on,
+thirteenth bits are turned on for both of these examples and then the first bit
+here is turned on. So that's how we can encode integers into vectors and then
+these vectors can feed in to neural nets.
+
+One more issue to be careful with here by the way is let's look at the data
+type of encoding. We always want to be careful with data types. What would you
+expect x encoding's data type to be? When we're plugging numbers into neural
+nets we don't want them to be integers. We want them to be floating point
+numbers that can take on various values but the D type here is actually 64-bit
+integer and the reason for that I suspect is that one hot received a 64 bit
+integer here and it returned to the same data type and when you look at the
+signature of one hot it doesn't even take a D type a desired data type of the
+output tensor and so we can't in a lot of functions in torch we'd be able to do
+something like D type equals torch dot float 32 which is what we want but one
+does not support that.
+
+So instead we're going to want to cast this to float like this so that these
+everything is the same everything looks the same but the D type is float32 and
+floats can feed into neural nets.

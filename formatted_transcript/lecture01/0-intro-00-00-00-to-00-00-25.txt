@@ -1,0 +1,10 @@
+Hello, my name is André and I’ve been training deep neural networks for a bit
+more than a decade. In this lecture, I’d like to show you what neural network
+training looks like under the hood.
+
+So, in particular, we are going to start with a blank Jupyter notebook. By the
+end of this lecture, we will define and train a neural net. You’ll get to see
+everything that goes on under the hood and exactly how that works on an
+intuitive level.
+
+Now, specifically, what I would like to do is I would like to

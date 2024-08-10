@@ -1,0 +1,55 @@
+Now we shouldn't be too happy with ourselves actually because we have a bad bug
+and we have not surfaced the bug because of some specific conditions that we
+have to think about right now. So here's the simplest case that shows the bug.
+Say I create a single node A and then I create a B that is A plus A and then I
+call backward. So what's going to happen is A is 3 and then B is A plus A so
+there's two arrows on top of each other here then we can see that B is of
+course the forward pass works B is just A plus A which is 6 but the gradient
+here is not actually correct that we calculated automatically and that's
+because of course just doing calculus in your head and the derivative of B with
+respect to A should be 2. One plus one. It's not one.
+
+Intuitively what's happening here, right, so B is the result of A plus A, and
+then we called backward on it. So let's go up and see what that does. B is a
+result of addition, so out as B. And then when we called backward, what
+happened is self.grad was set to 1, and then other.grad was set to 1. But
+because we're doing A plus A, self and other are actually the exact same
+object. So we are overriding the gradient. We are setting it to 1, and then we
+are setting it again to 1. And that's why it stays at 1. So that's a problem.
+
+Another way to see this in a little bit more complicated expression. So here we
+have A and B and then D will be the multiplication of the two and E will be the
+addition of the two and then we multiply E times D to get F and then we call F
+dot backward and these gradients if you check will be incorrect. So
+fundamentally what's happening here again is basically we're going to see an
+issue anytime we use a variable more than once. Until now in these expressions
+above, every variable is used exactly once, so we didn't see the issue. But
+here if a variable is used more than once, what's going to happen during
+backward pass?
+
+We're back propagating from F to E to D, so far so good, but now E calls it
+backward and it deposits its gradients to A and B, but then we come back to D
+and call backward and it overwrites those gradients at A and B. So that's
+obviously a problem. And the solution here, if you look at the multivariate
+case of the chain rule and its generalization there, the solution there is
+basically that we have to accumulate these gradients, these gradients add. And
+so instead of setting those gradients, we can simply do plus equals.
+
+We need to accumulate those gradients. Plus equals, plus equals, plus equals,
+plus equals. And this will be okay, remember, because we are initializing them
+at zero. So they start at zero, and then any contribution that flows backwards
+will simply add. So now if we redefine this one, because the plus equals this
+now works, because A.grad started at zero, And when we call B.backward, we
+deposit one, and then we deposit one again. And now this is two, which is
+correct. And here, this will also work, and we'll get correct gradients.
+Because when we call E.backward, we will deposit the gradients from this
+branch. And then when we get to D.backward, it will deposit its own gradients.
+And then those gradients simply add on top of each other.
+
+And so we just accumulate those gradients, and that fixes the issue. Okay, now
+before we move on, let me actually do a bit of cleanup here and delete some of
+this intermediate work. So I'm not going to need any of this now that we've
+derived all of it. We are going to keep this because I want to come back to it.
+Delete the 10H, delete our modigating example, delete the step, delete this,
+keep the code that draws, and then delete this example and leave behind only
+the definition of value.

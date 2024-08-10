@@ -1,0 +1,82 @@
+Okay, so now that we have some machinery to build out pretty complicated
+mathematical expressions, we can also start building up neural nets. And as I
+mentioned, neural nets are just a specific class of mathematical expressions.
+So we're going to start building out a neural net piece by piece, and
+eventually we'll build out a two layer multilayer layer perceptron as it's
+called. And I'll show you exactly what that means. Let's start with a single
+individual neuron. We've implemented one here. But here I'm going to implement
+one that also subscribes to the PyTorch API in how it designs its neural
+network modules. So just like we saw that we can like match the API of PyTorch
+on the autograd side, we're going to try to do that on the neural network
+modules. So here's class neuron and just for the sake of efficiency I'm going
+to copy paste some sections that are relatively straightforward. So the
+constructor will take number of inputs to this neuron which is how many inputs
+come to a neuron. So this one for example has three inputs. And then it's going
+to create a weight that is some random number between negative one and one for
+every one of those inputs and a bias that controls the overall trigger
+happiness of this neuron. And then we're going to implement a def underscore
+underscore call of self and x, some input x. And really what we want to do here
+is w times x plus b where w times x here is a dot product specifically. Now, if
+you haven't seen call, let me just return 0.0 here for now. The way this works
+now is we can have an x which is, say, like 2.0, 3.0. Then we can initialize a
+neuron that is two-dimensional because these are two numbers. And then we can
+feed those two numbers into that neuron to get an output. And so when you use
+this notation, n of x, Python will use call. so currently col just returns 0.0
+now we'd like to actually do the forward pass of this neuron instead so what
+we're going to do here first is we need to basically multiply all of the
+elements of w with all of the elements of x pairwise we need to multiply them
+so the first thing we're going to do is we're going to zip up salta w and x and
+in python zip takes two iterators and it creates a new iterator that iterates
+over the tuples of their corresponding entries. So for example, just to show
+you, we can print this list and still return 0.0 here. Sorry, I'm in my... So
+we see that these Ws are paired up with the Xs, W with X. and now what we want
+to do is for wi xi in we want to multiply w times wi times xi and then we want
+to sum all of that together to come up with an activation and add also self.b
+on top so that's the raw activation and then of we need to pass that through a
+null linearity. So what we're going to be returning is act.10h. And here's out.
+So now we see that we are getting some outputs. And we get a different output
+from a neuron each time because we are initializing different weights and
+biases. And then to be a bit more efficient here actually, sum, by the way,
+takes a second optional parameter, which is the start. And by default, the
+start is zero. So these elements of this sum will be added it on top of zero to
+begin with but actually we can just start with self.b and then we just have an
+expression like this and then the generator expression here must be
+parenthesized in Python. There we go. Yep so now we can forward a single
+neuron. Next up we're going to define a layer of neurons. So here we have a
+schematic for a MLP. So we see that these These MLPs, each layer, this is one
+layer, has actually a number of neurons, and they're not connected to each
+other, but all of them are fully connected to the input. So what is a layer of
+neurons? It's just a set of neurons evaluated independently. So in the interest
+of time, I'm going to do something fairly straightforward here. It's literally
+a layer, it's just a list of neurons, and then how many neurons do we have? We
+take that as an input argument here. How many neurons do you want in your
+layer? Number of outputs in this layer. And so we just initialize completely
+independent neurons with this given dimensionality. And when we call on it, we
+just independently evaluate them. So now instead of a neuron, we can make a
+layer of neurons. They are two-dimensional neurons, and let's have three of
+them. And now we see that we have three independent evaluations of three
+different neurons. right okay and finally let's complete this picture and
+define an entire multi-layered perceptron or MLP and as we can see here in an
+MLP these layers just feed into each other sequentially so let's come here and
+I'm just going to copy the code here in interest of time so an MLP is very
+similar we're taking the number of inputs as before but now instead of saying
+taking a single and out which is number of neurons in a single layer we're
+going to take a list of nouts and this list defines the sizes of all the layers
+that we want in our MLP. So here we just put them all together and then iterate
+over consecutive pairs of these sizes and create layer objects for them and
+then in the call function we are just calling them sequentially so that's an
+MLP really. And let's actually re-implement this picture so we want three input
+neurons and then two layers of four and an output unit. So we want a
+three-dimensional input say this is an example input we want three inputs into
+two layers of four and one output and this of course is an mlp and there we go
+that's a forward pass of an mlp to make this a little bit nicer you see how we
+have just a single element but it's wrapped in the list because layer always
+returns lists circle for convenience return outs at zero if len outs is exactly
+a single element else return fullest and this will allow us to just get a
+single value out at the last layer that only has a single neuron and finally we
+should be able to draw dot of n of X and as you might imagine these expressions
+are now getting relatively involved so this is an entire MLP that we're
+defining now all the way until a single output. Okay. And so obviously you
+would never differentiate on pen and paper, these expressions, but with micro
+grad, we will be able to back propagate all the way through this and back
+propagate into these weights of all these neurons. So let's see how that works.

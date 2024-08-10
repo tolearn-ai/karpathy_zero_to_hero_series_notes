@@ -1,0 +1,189 @@
+So let's now fill in those gradients and actually do backpropagation manually.
+So let's start filling in these gradients and start all the way at the end, as
+I mentioned here. First, we are interested to fill in this gradient here. So
+what is the derivative of L with respect to L? In other words, if I change L by
+a tiny amount h, how much does L change? It changes by h. So it's proportional,
+and therefore the derivative will be 1. we can of course measure these or
+estimate these numerical gradients numerically just like we've seen before so
+if I take this expression and I create a def lol function here and put this
+here now the reason I'm creating a gating function lol here is because I don't
+want to pollute or mess up the global scope here this is just kind of like a
+little staging area and as you know in python all of these will be local
+variables to this function so I'm not changing any of the global scope here. So
+here L1 will be L and then copy pasting this expression we're going to add a
+small amount H in for example A right and this would be measuring the
+derivative of L with respect to A. So here this will be L2 and then we want to
+print test derivative so print L2 minus L1 which is how much L changed and then
+normalize it by H so this is the rise over run and we have to be careful
+because L is a valid node so we actually want its data so that these are floats
+dividing by H and this should print the derivative of L with respect to A
+because A is the one that we bumped a little bit by H so what is the derivative
+of L with respect to A, it's 6. Okay, and obviously, if we change L by H, then
+that would be here effectively. This looks really awkward, but changing L by H,
+you see the derivative here is 1. That's kind of like the base case of what we
+are doing here. So So basically we can come up here and we can manually set
+l.grad to 1. This is our manual backpropagation. l.grad is 1 and let's redraw.
+And we'll see that we filled in grad is 1 for l. We're now going to continue
+the backpropagation. So let's here look at the derivatives of l with respect to
+d and f. Let's do a d first. So what we are interested in, if I create a
+markdown on here, is we'd like to know, basically we have that l is d times f,
+and we'd like to know what is dL by dd. What is that? And if you know your
+calculus, L is d times f, so what is dL by dd? It would be f. And if you don't
+believe me, we can also just derive it because the proof would be fairly
+straightforward. We go to the definition of the derivative, which is f of x
+plus h minus f of x, divide h. as a limit of h goes to 0 of this kind of
+expression. So when we have L is d times f, then increasing d by h would give
+us the output of d plus h times f. That's basically f of x plus h, right? Minus
+d times f. And then divide h. And symbolically, expanding out here, we would
+have basically d times f plus h times f minus d times f. Divide h. And then you
+see how the df minus df cancels, so you're left with h times f. Divide h, which
+is f. So in the limit as h goes to 0 of derivative definition, we just get f in
+the case of d times f. So symmetrically, dl by df will just be d. So what we
+have is that f.grad we see now is just the value of d, which is 4. And we see
+that d.grad is just the value of f. And so the value of f is negative 2. So
+we'll set those manually. Let me erase this markdown node. and then let's
+redraw what we have. Okay. And let's just make sure that these were correct. So
+we seem to think that dl by dd is negative two. So let's double check. Let me
+erase this plus h from before. And now we want the derivative with respect to
+f. So let's just come here when I create f and let's do a plus h here. And this
+should print a derivative of l with respect to f. So we expect to see four.
+Yeah, and this is 4 up to floating point funkiness. And then dl by dd should be
+f, which is negative 2. Grad is negative 2. So if we, again, come here and we
+change d, d.data plus equals h right here. So we expect, so we've added a
+little h, and then we see how l changed. and we expect to print negative two.
+There we go. So we've numerically verified. What we're doing here is kind of
+like an inline gradient check. Gradient check is when we are deriving this like
+back propagation and getting the derivative we expect to all the intermediate
+results. And then numerical gradient is just, you know, estimating it using
+small step size. Now we're getting to the crux of back propagation. So this
+will be the most important node to understand because if you understand the
+gradient for this node, you understand all of backpropagation and all of
+training of neural nets, basically. So we need to derive dl by dc. In other
+words, the derivative of l with respect to c because we've computed all these
+other gradients already. Now we're coming here and we're continuing the
+backpropagation manually. So we want dl by dc, and then we'll also derive dl by
+de. Now here's the problem. How do we derive dl by dc? We actually know the
+derivative l with respect to d, so we know how l is sensitive to d. But how is
+l sensitive to c? So if we wiggle c, how does that impact l through d? So we
+know dl by dc, and we also here know how C impacts D. And so just very
+intuitively, if you know the impact that C is having on D and the impact that D
+is having on L, then you should be able to somehow put that information
+together to figure out how C impacts L. And indeed this is what we can actually
+do. So in particular, we know just concentrating on D first. Let's look at what
+is the derivative basically of D with respect to c. So in other words, what is
+dd by dc? So here we know that d is c plus e. That's what we know. And now
+we're interested in dd by dc. If you just know your calculus again, and you
+remember that differentiating c plus e with respect to c, you know that that
+gives you 1.0. And we can also go back to the basics and derive this. Because
+again, we can go to our f of x plus h minus f of x divided by h as the
+definition of a derivative as h goes to 0. And so here, focusing on c and its
+effect on d, we can basically do the f of x plus h will be c is incremented by
+h plus c. That's the first evaluation of our function. Minus c plus c. And then
+divide h. And so what is this? just expanding this out, this will be c plus h
+plus e minus c minus e divided h, and then you see here how c minus c cancels,
+e minus e cancels we're left with h over h, which is 1.0 and so by symmetry
+also, d by d e will be 1.0 as well so basically the derivative of a sum
+expression is very simple and this is the local derivative. So I call this the
+local derivative because we have the final output value all the way at the end
+of this graph. And we're now like a small node here. And this is a little plus
+node. And the little plus node doesn't know anything about the rest of the
+graph that it's embedded in. All it knows is that it did a plus. It took a C
+and an E, added them, and created a D. And this plus node also knows the local
+influence of C on D, or rather the derivative of d with respect to c and it
+also knows the derivative of d with respect to e but that's not what we want
+that's just a local derivative what we actually want is dl by dc and l is here
+just one step away but in a general case this little plus node could be
+embedded in like a massive graph so again we know how l impacts d and now we
+know how c and e impact d How do we put that information together to write dl
+by dc? And the answer, of course, is the chain rule in calculus. And so I
+pulled up chain rule here from Wikipedia. And I'm going to go through this very
+briefly. So chain rule, Wikipedia sometimes can be very confusing and calculus
+can be very confusing. Like this is the way I learned chain rule and it was
+very confusing. Like what is happening? It's just complicated. So I like this
+expression much better. If a variable z depends on a variable y, which itself
+depends on a variable x, then z depends on x as well, obviously, through the
+intermediate variable y. And in this case, the chain rule is expressed as, if
+you want dz by dx, then you take the dz by dy and you multiply it by dy by dx.
+So the chain rule fundamentally is telling you how we chain these derivatives
+together correctly. So to differentiate through a function composition, we have
+to apply a multiplication of those derivatives. So that's really what chain
+rule is telling us. And there's a nice little intuitive explanation here, which
+I also think is kind of cute. The chain rule states that knowing the
+instantaneous rate of change of z with respect to y, and y relative to x allows
+one to calculate the instantaneous rate of change of z relative to x as a
+product of those two rates of change, simply the product of those two. So
+here's a good one. If a car travels twice as fast as a bicycle and the bicycle
+is four times as fast as walking men, then the car travels two times four,
+eight times as fast as the men. And so this makes it very clear that the
+correct thing to do sort of is to multiply. So So car is twice as fast as
+bicycle, and bicycle is four times as fast as man. So the car will be eight
+times as fast as the man. And so we can take these intermediate rates of
+change, if you will, and multiply them together. And that justifies the chain
+rule intuitively. So have a look at chain rule. But here, really what it means
+for us is there's a very simple recipe for deriving what we want, which is dl
+by dc. and what we have so far is we know want and we know what is the impact
+of d on l so we know dl by dd, the derivative of l with respect to dd we know
+that that's negative 2 and now because of this local reasoning that we've done
+here, we know dd by dc so how does c impact d and in particular this is a plus
+node so the local derivative is simply 1.0 it's very simple and so the chain
+rule tells us that dl by dc going through this intermediate variable will just
+be simply dl by dd times dd by dc. That's chain rule. So this is identical to
+what's happening here, except z is rl, y is rd, and x is rc. So we literally
+just have to multiply these. And because these local derivatives, like dd by
+dc, are just 1, we basically just copy over dl by dd because this is just times
+one so what is it so because dl by dd is negative two what is dl by dc well
+it's the local gradient 1.0 times dl by dd which is negative two so literally
+what a plus node does you can look at it that way is it literally just routes
+the gradient because the plus nodes local derivatives are just one and so in
+the chain rule 1 times dl by dd is just dl by dd. And so that derivative just
+gets routed to both c and to e in this case. So basically, we have that e.grad,
+or let's start with c, since that's the one we've looked at, is negative 2
+times 1, negative 2. and in the same way by symmetry e.grad will be negative
+two that's the claim so we can set those we can redraw and you see how we just
+assign negative to negative two so this back propagating signal which is
+carrying the information of like what is the derivative of l with respect to
+all the intermediate nodes we can imagine it almost like flowing backwards
+through the graph and a plus node will simply distribute the derivative to all
+the leaf nodes, sorry, to all the children nodes of it. So this is the claim,
+and now let's verify it. So let me remove the plus h here from before, and now
+instead what we're going to do is we want to increment c. So c.data will be
+incremented by h, and when I run this, we expect to see negative 2. And then of
+course for e, so e dot data plus equals h and we expect to see negative two
+simple so those are the derivatives of these internal nodes and now we're going
+to recurse our way backwards again and we're again going to apply the chain
+rule so here we go our second application of chain rule and we will apply it
+all the way through the graph which just happened to only have one more node
+remaining we have that dl by de as we have just calculated is negative 2. So we
+know that. So we know the derivative of l with respect to e. And now we want dl
+by da, right? And the chain rule is telling us that that's just dl by de
+negative 2 times the local gradient. So what is the local gradient? basically
+DE by DA. We have to look at that. So I'm a little times node inside a massive
+graph and I only know that I did A times B and I produced an E. So now what is
+DE by DA and DE by DB? That's the only thing that I sort of know about. That's
+my local gradient. So because we have that E is A times B, we're asking what is
+DE by DA? And of course we just did that here. We had a times, so I'm not going
+to re-derive it. But if you want to differentiate this with respect to a,
+you'll just get b, right? The value of b, which in this case is negative 3.0.
+So basically we have that dl by da. Well, let me just do it right here. We have
+that a.grad and we are applying chain rule. here is DL by DE which we see here
+is negative 2 times what is DE by DA it's the value of B which is negative 3
+that's it and then we have B dot grad is again DL by DE which is negative 2
+just the same way times what is DE by D DB is is the value of a, which is
+2.2.0. That's the value of a. So these are our claimed derivatives. Let's
+redraw. And we see here that a.grad turns out to be 6, because that is negative
+2 times negative 3. And b.grad is negative 2 times 2, which is negative 4. So
+those are our claims. let's delete this and let's verify them. We have a here,
+a.data plus equals h. So the claim is that a.grad is 6. Let's verify, 6. And we
+have b.data plus equals h. So nudging b by h and looking at what happens, we
+claim it's negative 4. And indeed, It's negative 4 plus minus again float
+oddness and That's it this that was the manual back propagation All the way
+from here to all the leaf nodes and I've done it piece by piece and really all
+we've done is as you saw We iterated through all the nodes one by one and
+locally applied the chain rule We always know what is the derivative of L with
+respect to this little output and then we look at how this output was produced.
+This output was produced through some operation and we have the pointers to the
+children nodes of this operation. And so in this little operation, we know what
+the local derivatives are and we just multiply them onto the derivative always.
+So we just go through and recursively multiply on the local derivatives. And
+that's what back propagation is. It's just a recursive application of chain
+rule backwards through the computation graph.

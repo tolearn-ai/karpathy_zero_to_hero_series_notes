@@ -1,0 +1,19 @@
+let's see this power in action just very briefly. What we're going to do is
+we're going to nudge our inputs to try to make L go up. So in particular, what
+we're doing is we want A.data. We're going to change it. And if we want L to go
+up, that means we just have to go in the direction of the gradient. So A should
+increase in the direction of gradient by like some small step amount. This is
+the step size. And we don't just want this for B, but also for B. also for C,
+also for F. Those are leaf nodes, which we usually have control over. And if we
+nudge in direction of the gradient, we expect a positive influence on L. So we
+expect L to go up positively. So it should become less negative. It should go
+up to, say, negative 6 or something like that. It's hard to tell exactly. And
+we'd have to rerun the forward pass. So let me just do that here. This would be
+the forward pass, f would be unchanged. This is effectively the forward pass.
+And now if we print l.data, we expect, because we nudged all the values, all
+the inputs in the rational gradient, we expected less negative l, we expect it
+to go up. So maybe it's negative six or so. Let's see what happens. Okay,
+negative seven. And this is basically one step of an optimization that will end
+up running. And really this gradient just give us some power because we know
+how to influence the final outcome. And this will be extremely useful for
+training all that as well.

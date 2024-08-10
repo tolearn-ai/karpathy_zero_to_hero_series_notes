@@ -1,0 +1,45 @@
+
+So like before we are starting with a completely blank Jupyter notebook page.
+The first thing is I would like to basically load up the data set names.txt. So
+we're going to open up names.txt for reading and we're going to read in
+everything into a massive string and then because it's a massive string we only
+like the individual words and put them in the list. So let's call split lines
+on that string to get all of our words as a Python list of strings. So
+basically we can look at, for example, the first 10 words and we have that it's
+a list of Emma, Olivia, Ava, and so on. And if we look at the top of the page
+here, that is indeed what we see. So that's good. This list actually makes me
+feel that this is probably sorted by frequency. But okay, so these are the
+words. Now we'd like to actually like learn a little bit more about this
+dataset. The total number of words we expect this to be roughly 32,000 and then
+what is the, for example, shortest word? So min of len of each word for w in
+words, so the shortest word will be length 2 and max of len w for w in words,
+so the longest word will be 15 characters.
+
+So let's now think through our very first language model. As I mentioned, a
+character level language model is predicting the next character in a sequence
+given already some concrete sequence of characters before it. Now what we have
+to realize here is that every single word here, like Isabella, is actually
+quite a few examples packed into that single word. Because what is the
+existence of a word like Isabella in the dataset telling us really? It's saying
+that the character 'i' is a very likely character to come first in the sequence
+of a name. The character 's' is likely to come after 'i'. The character 'a' is
+likely to come after 's'. The character 'b' is very likely to come after 'isa'
+and so on all the way to a following 'isabel'. And then there's one more
+example actually packed in here, and that is that after there's Isabella, the
+word is very likely to end. So that's one more sort of explicit piece of
+information that we have here that we have to be careful with. And so there's a
+lot packed into a single individual word in terms of the statistical structure
+of what's likely to follow in these character sequences.
+
+And then, of course, we don't have just an individual word. We actually have
+32,000 of these, and so there's a lot of structure here to model. Now in the
+beginning, what I'd like to start with is I'd like to start with building a
+bigram language model. Now in a bigram language model, we're always working
+with just two characters at a time. So we're only looking at one character that
+we are given, and we're trying to predict the next character in the sequence.
+So what characters are likely to follow 'R', what characters are likely to
+follow 'A', and so on? And we're just modeling that kind of a little local
+structure. We're forgetting the fact that we may have a lot more information.
+We're always just looking at the previous character to predict the next one. So
+it's a very simple and weak language model, but I think it's a great place to
+start.

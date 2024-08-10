@@ -1,0 +1,28 @@
+So now we have to evaluate the loss, but we're not using the mean squared
+error, we're using the negative log likelihood because we are doing
+classification, we're not doing regression as it's called. So here we want to
+calculate loss. Now the way we calculate it is just this average negative log
+likelihood. Now this probz here has a shape of 5 by 27. And so to get all the,
+we basically want to pluck out the probabilities at the correct indices here.
+So in particular, because the labels are stored here in the array wise,
+basically what we're after is for the first example, we're looking at
+probability of five, right? At index five. For the second example, at the
+second row or row index one, we are interested in the probability assigned to
+index 13. At the second example, we also have 13. At the third row, we want 1.
+And at the last row, which is 4, we want 0. So these are the probabilities
+we're interested in, right? And you can see that they're not amazing as we saw
+above. So these are the probabilities we want, but we want a more efficient way
+to access these probabilities, not just listing them out in a tuple like this.
+So it turns out that the way to do this in PyTorch, one of the ways at least,
+is we can basically pass in all of these integers in the vectors. So these
+ones, you see how they're just 0, 1, 2, 3, 4? We can actually create that using
+torch.arrange. So we can index here with torch.arrange and here we index with
+wise. You see that that gives us exactly these numbers. So that plucks out the
+probabilities that the neural network assigns to the correct next character.
+Now we take those probabilities and we actually look at the log probability. So
+we want to dot log and then we want to just average that up. So take the mean
+of all of that and then it's the negative average log likelihood that is the
+loss. So the loss here is 3.7 something and you see that this loss 3.76, 3.76
+is exactly as we've obtained before. But this is a vectorized form of that
+expression. So we get the same loss. and this same loss we can consider sort of
+as part of this forward pass and we've achieved here now loss

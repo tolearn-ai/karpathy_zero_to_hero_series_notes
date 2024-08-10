@@ -1,0 +1,79 @@
+Okay, so let's create ourselves a very simple example data set here. So this
+data set has four examples. And so we have four possible inputs into the neural
+net. And we have four desired targets. So we'd like the neural net to assign or
+output 1.0 when it's fed this example, negative one when it's fed these
+examples, and one when it's fed this example. So it's a very simple binary
+classifier neural net basically that we would like here. Now let's think what
+the neural net currently thinks about these four examples. We can just get
+their predictions. Basically we can just call n for x in xs and then we can
+print. So these are the outputs of the neural net on those four examples. So
+the first one is 0.91 but we like it to be 1 so we should push this one higher.
+This one we want to be higher. This one says 0.88 and we want this to be
+negative 1. This is 0.88, we want it to be negative 1. And this one is 0.88, we
+want it to be 1. So how do we make the neural net and how do we tune the
+weights to better predict the desired targets? And the trick used in deep
+learning to achieve this is to calculate a single number that somehow measures
+the total performance of your neural net. And we call this single number the
+loss. So the loss first is a single number that we're going to define that
+basically measures how well the neural net is performing. Right now we have the
+intuitive sense that it's not performing very well because we're not very much
+close to this. So the loss will be high and we'll want to minimize the loss. So
+in particular in this case what we're going to do is we're going to implement
+the mean squared error loss. So what this is doing is we're going to basically
+iterate for y ground truth and y output in zip of y's and y's. So we're going
+to pair up the ground truths with the predictions and this zip iterates over
+tuples of them and for each y ground truth and y output we're going to subtract
+them and square them. So let's first see what these losses are. These are
+individual loss components and so basically for each one of the four we are
+taking the prediction and the ground truth we are subtracting them and squaring
+them so because this one is so close to its target 0.91 is almost one
+subtracting them gives a very small number so here we would get like a negative
+0.1 and then squaring it just makes sure that regardless of whether we are more
+negative or more positive, we always get a positive number. Instead of squaring
+the shitter, we could also take, for example, the absolute value. We need to
+discard the sign. And so you see that the expression is ranged so that you only
+get zero exactly when y out is equal to y ground truth. When those two are
+equal, so your prediction is exactly the target, you are going to get zero. And
+if your prediction is not the target, you are going to get some other number.
+So here, for example, we are way off. And so that's why the loss is quite high.
+and the more off we are the greater the loss will be so we don't want high loss
+we want low loss and so the final loss here will be just the sum of all of
+these numbers so you see that this should be zero roughly plus zero roughly but
+plus seven so loss should be about seven here and now we want minimize the
+loss. We want the loss to be low because if loss is low then every one of the
+predictions is equal to its target. So the lowest it can be is zero and the
+greater it is the worse off the neural net is predicting. So now of course if
+we do loss.backward something magical happened when I hit enter and the magical
+thing of course that happened is that we can look at n.layers.neuron and dot
+layers at say like the first layer dot neurons at zero because remember that
+mlp has the layers which is a list and each layer has neurons which is a list
+and that gives us an individual neuron and then it's got some weights and so we
+can for example look at the weights at zero oops it's not called weights it's
+called w and that's a value but now this value also has a grad because of the
+backward pass and so we see that because this gradient here on this particular
+weight of this particular neuron of this particular layer is negative we see
+that its influence on the loss is also negative so slightly increasing this
+particular weight of this neuron of this layer would make the loss go down and
+we actually have this information for every single one of our neurons and all
+of their parameters. Actually, it's worth looking at also the draw dot of loss,
+by the way. So previously, we looked at the draw dot of a single neuron forward
+pass, and that was already a large expression. But what is this expression? We
+actually forwarded every one of those four examples, and then we have the loss
+on top of them with the mean squared error. And so this is a really massive
+graph. Because this graph that we've built up now, oh my gosh, this graph that
+we've built up now, which is kind of excessive. It's excessive because it has
+four forward passes of a neural net for every one of the examples, and then it
+has the loss on top, and it ends with the value of the loss, which was 7.12.
+And this loss will now back propagate through all the four forward passes, all
+the way through just every single intermediate value of the neural net, all the
+way back to, of course, the parameters of weights which are the input so these
+weight parameters here are inputs to this neural net and these numbers here
+these scalars are inputs to the neural net so if we went around here we will
+probably find some of these examples this 1.0 potentially maybe this 1.0 or you
+know some of the others and you'll see that they all have gradients as well the
+thing is these gradients on the input data are not that useful to us and that's
+because the input data seems to be not changeable. It's a given to the problem
+and so it's a fixed input. We're not going to be changing it or messing with it
+even though we do have gradients for it. But some of these gradients here will
+be for the neural network parameters, the W's and the B's, and those of course
+we we want to change.

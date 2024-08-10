@@ -1,0 +1,61 @@
+So now I would like to show you how you can do the exact same thing, but using
+a modern deep neural network library, like for example, PyTorch, which I've
+roughly modeled micrograd by. And so PyTorch is something you would use in
+production, and I'll show you how you can do the exact same thing, but in
+PyTorch API. So I'm just going to copy paste it in and walk you through it a
+little bit. This is what it looks like. So we're going to import PyTorch and
+then we need to define these value objects like we have here.
+
+Now, MicroGrad is a scalar valued engine, so we only have scalar values like
+2.0. But in PyTorch, everything is based around tensors. And like I mentioned,
+tensors are just n-dimensional arrays of scalars. So that's why things get a
+little bit more complicated here. I just need a scalar valued tensor, a tensor
+with just a single element. But by default, when you work with PyTorch, you
+would use more complicated tensors like this. So if I import PyTorch, then I
+can create tensors like this. And this tensor, for example, is a 2x3 array of
+scalars in a single compact representation. So we can check its shape. We see
+that it's a 2x3 array, and so on. So this is usually what you would work with
+in the actual libraries.
+
+So here I'm creating a tensor that has only a single element 2.0 and then I'm
+casting it to be double because Python is by default using double precision for
+its floating-point numbers so I'd like everything to be identical. By default
+the data type of these tensors will be float 32 so it's only using a single
+precision float. So I'm casting it to double so that we have float 64 just like
+in Python. So I'm casting to double and then we get something similar to value
+of two.
+
+The next thing I have to do is because these are leaf nodes, by default PyTorch
+assumes that they do not require gradients. So I need to explicitly say that
+all of these nodes require gradients. Okay, so this is going to construct
+scalar valued one element tensors. Make sure that PyTorch knows that they
+require gradients.
+
+Now by default these are set to false by the way because of efficiency reasons
+because usually you would not want gradients for leaf nodes like the inputs to
+the network and this is just trying to be efficient in the most common cases.
+So once we've defined all of our values in pytorch land we can perform
+arithmetic just like we can here in micrograd land so this would just work and
+then there's a torch.10h also and when we get back as a tensor again and we can
+just like in micrograd it's got a data attribute and it's got grad attributes
+so these tensor objects just like in micrograd have a dot data and a dot grad
+and the only difference here is that we need to call a dot item because
+otherwise um pytorch dot item basically takes a single tensor of one element
+and it just returns that element stripping out the tensor so let me just run
+this and hopefully we are going to get this is going to print the forward pass
+which is 0.707 and this will be the gradients which hopefully are 0.50 negative
+1.5 and 1.
+
+So if we just run this there we go 0.7 so the forward pass agrees and then 0.50
+negative 1.5 and 1. so pytorch agrees with us and just to show you here
+basically oh here's a tensor with a single element and it's a double and we can
+call that item on it to just get the single number out so that's what item does
+and o is a tensor object like I mentioned and it's got a backward function just
+like we've implemented and then all of these also have a dot grad so like x2
+for example and the grad and it's a tensor and we can pop out the individual
+number with dot item so basically Torch can do what we did in microGrad as a
+special case when your tensors are all single-element tensors. But the big deal
+with PyTorch is that everything is significantly more efficient because we are
+working with these tensor objects, and we can do lots of operations in parallel
+on all of these tensors. But otherwise, what we've built very much agrees with
+the API of PyTorch.

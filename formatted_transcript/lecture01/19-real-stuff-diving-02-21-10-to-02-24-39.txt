@@ -1,0 +1,48 @@
+
+I also wanted to show you a little bit of real stuff so that you get to see how
+this is actually implemented in a production-grade library like PyTorch. So in
+particular, I wanted to find and show you the backward pass for 10h in PyTorch.
+So here in micrograd, we see that the backward pass for 10h is 1 minus t
+square, where t is the output of the 10h of x, times out that grad, which is
+the chain rule. So we're looking for something that looks like this.
+
+Now, I went to PyTorch, which has an open source GitHub code base, and I looked
+through a lot of its code. And honestly, I spent about 15 minutes and I
+couldn't find 10H. And that's because these libraries, unfortunately, they grow
+in size and entropy. And if you just search for 10H, you get apparently 2,800
+results and 406 files. So I don't know what these files are doing, honestly and
+why there are so many mentions of 10-H. But unfortunately, these libraries are
+quite complex. They're meant to be used, not really inspected.
+
+Eventually, I did stumble on someone who tries to change the 10-H backward code
+for some reason, and someone here pointed to the CPU kernel and the CUDA kernel
+for 10-H backward. So basically, it depends on if you're using PyTorch on a CPU
+device or on a GPU, which these are different devices, and I haven't covered
+this.
+
+But this is the 10-inch backward kernel for CPU. And the reason it's so large
+is that, number one, this is like if you're using a complex type, which we
+haven't even talked about. If you're using a specific data type of B float 16,
+which we haven't talked about. And then if you're not, then this is the kernel.
+And deep here, we see something that resembles our backward pass. So they have
+A times 1 minus B square. so this b here must be the output of the 10h and this
+is the output grad so here we found it deep inside PyTorch on this location for
+some reason inside binary ops kernel when 10h is not actually a binary op and
+then this is the GPU kernel we're not complex we're here and here we go with
+one line of code so we did find it but basically unfortunately these code bases
+are very large and micrograd is very very simple but if you actually want to
+use real stuff finding the code for it you'll actually find that difficult.
+
+I also wanted to show you a little example here where pytorch is showing you
+how you can register a new type of function that you want to add to pytorch as
+a lego building block. So here if you want to for example add a legender
+polynomial three here's how you could do it you will register it as a class
+that subclasses torch.arguard.function and then you have to tell PyTorch how to
+forward your new function and how to backward through it. So as long as you can
+do the forward pass of this little function piece that you want to add and as
+long as you know the local derivative, the local gradients which are
+implemented in the backward, PyTorch will be able to back propagate through
+your function and then you can use this as a lego block in a larger lego castle
+of all the different lego blocks that pytorch already has and so that's the
+only thing you have to tell pytorch and everything would just work and you can
+register new types of functions in this way following this example

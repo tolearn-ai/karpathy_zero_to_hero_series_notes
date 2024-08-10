@@ -1,0 +1,35 @@
+Okay, so we've now trained a respectable bigram character-level language model.
+And we saw that we both sort of trained the model by looking at the counts of
+all the bigrams and normalizing the rows to get probability distributions. We
+saw that we can also then use those parameters of this model to perform
+sampling of new words. So we sample new names according to those distributions.
+And we also saw that we can evaluate the quality of this model. And the quality
+of this model is summarized in a single number, which is the negative log
+likelihood. And the lower this number is, the better the model is, because it
+is giving high probabilities to the actual next characters in all the bigrams
+in our training set. So that's all well and good, but we've arrived at this
+model explicitly by doing something that felt sensible. We were just performing
+counts, and then we were normalizing those counts. Now what I would like to do
+is I would like to take an alternative approach. We will end up in a very very
+similar position But the approach will look very different because I would like
+to cast the problem of bigram character level language modeling into the neural
+network framework and In the neural network framework, we're going to approach
+things slightly differently. But again end up in a very similar spot. I'll go
+into that later Now our neural network is going to be a still a bigram
+character level language model So it receives a single character as an input
+then there's neural network with some weights or some parameters W it's going
+to output the probability distribution over the next character in a sequence.
+It's going to make guesses as to what is likely to follow this character that
+was input to the model. And then in addition to that we're going to be able to
+evaluate any setting of the parameters of the neural net because we have the
+loss function, the negative log likelihood. So we're going to take a look at
+this probability distributions and we're going to use the labels which are
+basically just the identity of the next character in that bigram, the second
+character. So knowing what second character actually comes next in the bigram
+allows us to then look at how high of probability the model assigns to that
+character and then we of course want the probability to be very high and that
+is another way of saying that the loss is low. So we're going to use gradient
+based optimization then to tune the parameters of this network because we have
+the loss function and we're going to minimize it so we're going to tune the
+weights so that the neural net is correctly predicting the probabilities for
+the next character. So let's get started.

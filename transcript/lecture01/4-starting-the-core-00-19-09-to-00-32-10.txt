@@ -1,0 +1,145 @@
+and we'd like to move to neural networks. Now, as I mentioned, neural networks
+will be pretty massive expressions, mathematical expressions. So we need some
+data structures that maintain these expressions and that's what we're going to
+start to build out now. So we're going to build out this value object that I
+showed you in the readme page of micrograd. So let me copy paste a skeleton of
+the first very simple value object. So class value takes a single scalar value
+that it wraps and keeps track of and that's it. So we can, for example, do
+value of 2.0 and then we can look at its content. And Python will internally
+use the wrapper function to return this string. Oops, like that. So this is a
+value object with data equals two that we're creating here. Now what we'd like
+to do is we'd like to be able to have not just like two values, but we'd like
+to do A plus B, right? We'd like to add them. So currently you would get an
+error because Python doesn't know how to add two value objects. So we have to
+tell it. So here's addition. So you have to basically use these special double
+underscore methods in Python to define these operators for these objects. So if
+we use this plus operator, Python will internally call a.add of b. That's what
+will happen internally. And so b will be the other, and self will be a. And so
+we see that what we're going to return is a new value object, and it's going to
+be wrapping the plus of their data. but remember now because data is the actual
+like numbered python number so this operator here is just the typical floating
+point plus addition now it's not an addition of value objects and we'll return
+a new value so now a plus b should work and it should print value of negative
+one because that's two plus minus three there we go okay let's now implement
+multiply just so we can recreate this expression here. So multiply, I think it
+won't surprise you, will be fairly similar. So instead of add, we're going to
+be using mul, and then here, of course, we want to do times. And so now we can
+create a C value object, which will be 10.0. And now we should be able to do a
+times b. Well, let's just do a times b first. That's value of negative six now.
+And by the way, I skipped over this a little bit. Suppose that I didn't have
+the wrapper function here. Then it's just that you'll get some kind of an ugly
+expression. So what wrapper is doing is it's providing us a way to print out
+like a nicer looking expression in Python. So we don't just have something
+cryptic. We actually are, you know, it's a value of negative six. So this gives
+us a times. And then this, we should now be able to add C to it because we've
+defined and told the Python how to do a mall and add. And so this will
+basically be equivalent to a.mol of b, and then this new value object will be
+.add of c. And so let's see if that worked. Yep, so that worked well. That gave
+us 4, which is what we expect from before. And I believe we can just call them
+manually as well. There we go. So, yeah. Okay, so now what we are missing is
+the connected tissue of this expression. As I mentioned, we want to keep these
+expression graphs, so we need to know and keep pointers about what values
+produce what other values. So here, for example, we are going to introduce a
+new variable, which we'll call children, and by default it will be an empty
+tuple. And then we're actually going to keep a slightly different variable in
+the class, which we'll call underscore prev, which will be the set of children.
+This is how I did it in the original micrograd, looking at my code here. I
+can't remember exactly the reason. I believe it was efficiency. but this
+underscore children will be a tuple for convenience but then when we actually
+maintain it in the class it will be just this set yes i believe for efficiency
+um so now when we are creating a value like this with a constructor children
+will be empty and prep will be the empty set but when we are creating a value
+through addition or multiplication we're going to feed in the children of this
+value which in this case is self and other so those are the children here So
+now we can do d.prev and we'll see that the children of d we now know are this
+value of negative 6 and value of 10 and this of course is the value resulting
+from a times b and the c value which is 10. Now the last piece of information
+we don't know, so we know now the children of every single value but we don't
+know what operation created this value. So we need one more element here, let's
+call it underscore up, and by default this is the empty set for leaves, and
+then we'll just maintain it here. And now the operation will be just a simple
+string, and in the case of addition it's plus, in the case of multiplication
+it's times. So now we not just have d.pref, we also have a d.op, and we know
+that d was produced by an addition of those two values. And so now we have the
+full mathematical expression, and we're building out this data structure, and
+we know exactly how each value came to be by what expression and from what
+other values. Now, because these expressions are about to get quite a bit
+larger, we'd like a way to nicely visualize these expressions that we're
+building out. So for that, I'm going to copy-paste a bunch of slightly scary
+code that's going to visualize these expression graphs for us. So here's the
+code, and I'll explain it in a bit. But first let me just show you what this
+code does. Basically what it does is it creates a new function drawDot that we
+can call on some root node, and then it's going to visualize it. So if we call
+drawDot on D, which is this final value here, that is A times B plus C, it
+creates something like this. So this is D, and you see that this is A times B,
+creating an interpret value, plus C, gives us this output node, D. So that's
+draw.dataB. And I'm not going to go through this in complete detail. You can
+take a look at GraphVis and its API. GraphVis is an open source graph
+visualization software. And what we're doing here is we're building out this
+graph in GraphVis API. And you can basically see that trace is this helper
+function that enumerates all the nodes and edges in the graph. So that just
+builds a set of all the nodes and edges. and then we iterate through all the
+nodes and we create special node objects for them in using dot node and then we
+also create edges using dot dot edge and the only thing that's like slightly
+tricky here is you'll notice that I basically add these fake nodes which are
+these operation nodes so for example this node here is just like a plus node
+and I create these special op nodes here and I connect them accordingly. So
+these nodes of course are not actual nodes in the original graph. They're not
+actually a value object. The only value objects here are the things in squares.
+Those are actual value objects or representations thereof and these op nodes
+are just created in this draw dot routine so that it looks nice. Let's also add
+labels to these graphs just so we know what variables are where. So let's
+create a special underscore label or let's just do label equals empty by
+default and save it in each node. And then here we're going to do label is a,
+label is b, label is c. and then let's create a special e equals a times b and
+e dot label will be e it's kind of naughty and e will be e plus c and d dot
+label will be e okay so nothing really changes I just added this new e function
+new e variable and then here when we are printing this I'm going to print the
+label here. So this will be a percent s bar and this will be n dot label. And
+so now we have the label on the left here. So it says a b creating e and then e
+plus c creates d just like we have it here. And finally let's make this
+expression just one layer deeper, so D will not be the final output node.
+Instead, after D, we are going to create a new value object called F. We're
+going to start running out of variables soon. F will be negative 2.0, and its
+label will, of course, just be F. And then L, capital L, will be the output of
+our graph, and L will be P times F. So L will be negative 8 as the output. So
+now we don't just draw a d, we draw l. Okay. And somehow the label of l is
+undefined. Oops. l.label has to be explicitly sort of given to it. There we go.
+So l is the output. So let's quickly recap what we've done so far. We are able
+to build out mathematical expressions using only plus and times so far. They
+are scalar valued along the way. and we can do this forward pass and build out
+a mathematical expression. So we have multiple inputs here, a, b, c, and f,
+going into a mathematical expression that produces a single output, l. And this
+here is visualizing the forward pass. So the output of the forward pass is
+negative 8. That's the value. Now what we'd like to do next is we'd like to run
+backpropagation. And in backpropagation, we are going to start here at the end,
+and we're going to reverse calculate the gradient along all these intermediate
+values. And really what we're computing for every single value here, we're
+going to compute the derivative of that node with respect to L. So the
+derivative of L with respect to L is just 1. And then we're going to derive
+what is the derivative of L with respect to F, with respect to D, with respect
+to C, with respect to e, with respect to b, and with respect to a. And in a
+neural network setting, you'd be very interested in the derivative of basically
+this loss function, l, with respect to the weights of a neural network. And
+here, of course, we have just these variables a, b, c, and f, but some of these
+will eventually represent the weights of a neural net. And so we'll need to
+know how those weights are impacting the loss function. So we'll be interested
+basically in the derivative of the output with respect to some of its leaf
+nodes and those leaf nodes will be the weights of the neural net and the other
+leaf nodes of course will be the data itself but usually we will not want or
+use the derivative of the loss function with respect to data because the data
+is fixed but the weights will be iterated on using the gradient information. So
+next we are going to create a variable inside the value class that maintains
+the derivative of l with respect to that value and we will call this variable
+grad. So there's a dot data and there's a self.grad and initially it will be
+zero. And remember that zero is basically means no effect. So at initialization
+we're assuming that every value does not impact, does not affect the output.
+Right because if the gradient is zero that means that changing this variable is
+not changing the loss function. So by default we assume that the gradient is 0
+and then now that we have grad and it's 0.0 we are going to be able to
+visualize it here after data. So here grad is 0.4f and this will be in that
+grad and now we are going to be showing both the data and the grad initialized
+at zero and we are just about getting ready to calculate the back propagation
+and of course this grad again as I mentioned is representing the derivative of
+the output in this case l with respect to this value so with respect to so this
+is the derivative of l with respect to f with respect to d and so on

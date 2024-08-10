@@ -1,0 +1,60 @@
+Okay, so I rearranged everything and I put it all together from scratch. So
+here is where we construct our data set of bigrams. You see that we are still
+iterating only over the first word, Emma. I'm going to change that in a second.
+I added a number that counts the number of elements in Xs so that we explicitly
+see that the number of examples is 5. Because currently we were just working
+with Emma, there's 5 bigrams there. And here I added a loop of exactly what we
+had before. So we had 10 iterations of gradient descent, forward pass, backward
+pass, and an update. Running these two cells, initialization and gradient
+descent, gives us some improvement on the last function. But now I want to use
+all the words. And there's not 5, but 228,000 bigrams now. However, this should
+require no modification whatsoever. Everything should just run because all the
+code we wrote doesn't care if there's 5 bigrams or 228,000 bigrams and with
+everything we should just work. So you see that this will just run but now we
+are optimizing over the entire training set of all the bigrams and you see now
+that we are decreasing very slightly. So actually we can probably afford a
+larger learning rate and probably afford even larger learning rate— even 50
+seems to work on this very, very simple example, right? So let me re-initialize
+and let's run 100 iterations. See what happens. Okay. We seem to be coming up
+to some pretty good losses here: 2.47. Let me run 100 more. What is the number
+that we expect, by the way, in the loss? We expect to get something around what
+we had originally, actually. So all the way back, if you remember, in the
+beginning of this video, when we optimized just by counting, our loss was
+roughly 2.47 after we added smoothing. But before smoothing, we had roughly
+2.45 likelihood, sorry, loss. And so that's actually roughly the vicinity of
+what we expect to achieve. But before we achieved it by counting, and here we
+are achieving roughly the same result but with gradient-based optimization. So
+we come to about 2.46, 2.45, etc. And that makes sense because fundamentally,
+we're not taking in any additional information. We're still just taking in the
+previous character and trying to predict the next one, but instead of doing it
+explicitly by counting and normalizing, we are doing it with gradient-based
+learning. And it just so happens that the explicit approach happens to very
+well optimize the loss function. Without any need for gradient-based
+optimization, because the setup for bigram language models is so
+straightforward, it's so simple, we can just afford to estimate those
+probabilities directly and maintain them in a table. But the gradient-based
+approach is significantly more flexible so we've actually gained a lot because
+what we can do now is we can expand this approach and complexify the neural
+net. So currently, we're just taking a single character and feeding it into a
+neural net, and the neural net is extremely simple, but we're about to iterate
+on this substantially. We're going to be taking multiple previous characters
+and we're going to be feeding them into increasingly more complex neural nets.
+But fundamentally, the output of the neural net will always just be logits. And
+those logits will go through the exact same transformation. We are going to
+take them through a softmax, calculate the loss function and the negative log
+likelihood, and do gradient-based optimization. And so actually, as we
+complexify the neural nets and work all the way up to transformers, none of
+this will really fundamentally change. None of this will fundamentally change.
+The only thing that will change is the way we do the forward pass, where we
+take in some previous characters and calculate logits for the next character in
+a sequence. That will become more complex, but we'll use the same machinery to
+optimize it. And it's not obvious how we would have extended this bigram
+approach into the case where there are many more characters at the input
+because eventually, these tables would get way too large because there's way
+too many combinations of what previous characters could be. If you only have
+one previous character, we can just keep everything in a table that counts, but
+if you have the last 10 characters that are input, we can't actually keep
+everything in the table anymore. So this is fundamentally an unscalable
+approach and the neural network approach is significantly more scalable, and
+it's something that actually we can improve on over time. So that's where we
+will be digging next.

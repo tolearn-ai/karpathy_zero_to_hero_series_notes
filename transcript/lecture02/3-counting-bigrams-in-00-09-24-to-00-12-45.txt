@@ -1,0 +1,34 @@
+Now in order to learn the statistics about which characters are likely to
+follow other characters, the simplest way in the bigram language models is to
+simply do it by counting. So we're basically just going to count how often any
+one of these combinations occurs in the training set in these words. So we're
+going to need some kind of a dictionary that's going to maintain some counts
+for every one of these bigrams. So let's use a dictionary B and this will map
+these bigrams. so bigram is a tuple of character1, character2 and then b at
+bigram will be b.get of bigram which is basically the same as b at bigram but
+in the case that bigram is not in the dictionary b we would like to by default
+return a 0 plus 1 so this will basically add up all the bigrams and count how
+often they occur Let's get rid of printing, or rather let's keep the printing
+and let's just inspect what b is in this case. And we see that many bigrams
+occur just a single time. This one allegedly occurred three times. So a was an
+ending character three times, and that's true for all of these words. All of
+Emma, Olivia, and Eva and with A. So that's why this occurred three times. Now
+let's do it for all the words. Oops, I should not have printed. I meant to
+erase that. Let's kill this. Let's just run and now B will have the statistics
+of the entire data set. So these are the counts across all the words of the
+individual pygrams and we could for example look at some of the most common
+ones and least common ones this kind of grows in Python but the way to do this
+the simplest way I like is we just use b.items. b.items returns the tuples of
+key value in this case the keys are the character by grams and the values are
+the counts and so then what we want to do is we want to do sort it of this but
+by default sort is on the first item of a tuple but we want to sort by the
+values which are the second element of a tuple that is the key value so we want
+to use the key equals lambda that takes the key value and returns the key value
+at 1 not at 0 but at 1 which is the count so we want to sort by the count of
+these elements and actually we want it to go backwards so here what we have is
+the bigram QNR occurs only a single time DZ occurred only a single time and
+when we sort this the other way around we're going to see the most likely
+bigrams. So we see that n was very often an ending character many many times
+and apparently n almost always follows an a and that's a very likely
+combination as well. So this is kind of the individual counts that we achieve
+over the entire dataset.

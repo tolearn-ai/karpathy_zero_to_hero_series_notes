@@ -1,0 +1,160 @@
+So now I would like to do one more example of manual backpropagation using a
+bit more complex and useful example. We are going to backpropagate through a
+neuron. So we want to eventually build up neural networks. And in the simplest
+case, these are multilayer perceptrons, as they're called. So this is a two
+layer neural net. And it's got these hidden layers made up of neurons. And
+these neurons are fully connected to each other. Now biologically neurons are
+very complicated devices, but we have very simple mathematical models of them.
+And so this is a very simple mathematical model of a neuron. You have some
+inputs, Xs, and then you have these synapses that have weights on them. So the
+Ws are weights. And then the synapse interacts with the input to this neuron
+multiplicatively. So what flows to the cell body of this neuron is W times X.
+but there's multiple inputs, so there's many W times Xs flowing into the cell
+body. The cell body then has also like some bias, so this is kind of like the
+innate sort of trigger happiness of this neuron. So this bias can make it a bit
+more trigger happy or a bit less trigger happy regardless of the input. But
+basically we're taking all the W times X of all the inputs, adding the bias,
+and then we take it through an activation function. And this activation
+function is usually some kind of a squashing function, like a sigmoid or 10H or
+something like that. So as an example, we're going to use the 10H in this
+example. NumPy has a np.10H, so we can call it on a range, and we can plot it.
+This is the 10H function, and you see that the inputs, as they come in, get
+squashed on the white coordinate here. So right at zero, we're going to get
+exactly zero, And then as you go more positive in the input, then you'll see
+that the function will only go up to 1 and then plateau out. And so if you pass
+in very positive inputs, we're going to cap it smoothly at 1. And on the
+negative side, we're going to cap it smoothly to negative 1. So that's 10H. And
+that's the squashing function or an activation function. And what comes out of
+this neuron is just the activation function applied to the dot product of the
+weights and the inputs. So let's write one out. I'm going to copy paste because
+I don't want to type too much. But okay, so here we have the inputs x1, x2. So
+this is a two-dimensional neuron. So two inputs are going to come in. These are
+thought of as the weights of this neuron. Weights w1, w2. And these weights,
+again, are the synaptic strengths for each input. And this is the bias of the
+neuron, b. And now what we want to do is, according to this model, we need to
+multiply x1 times w1 and x2 times w2, and then we need to add bias on top of
+it. And it gets a little messy here, but all we are trying to do is x1 w1 plus
+x2 w2 plus b, and these are multiplied here, except I'm doing it in small steps
+so that we actually have pointers to all these intermediate nodes. So we have
+x1, w1 variable, x2, w2 variable, and I'm also labeling them. So n is now the
+cell body raw activation without the activation function for now. And this
+should be enough to basically plot it. So draw dot of n gives us x1 times w1,
+x2 times w2 being added. then the bias gets added on top of this and this n is
+this sum so we're now going to take it through an activation function and let's
+say we use the tan h so that we produce the output so what we'd like to do here
+is we'd like to do the output and i'll call it o is n dot tan h okay but we
+haven't yet written the tan h now the reason that we need to implement another
+tan h function here is that 10h is a hyperbolic function and we've only so far
+implemented a plus and a times and you can't make a 10h out of just pluses and
+times. You also need exponentiation. So 10h is this kind of a formula here. You
+can use either one of these and you see that there's exponentiation involved
+which we have not implemented yet for our little value node here. So we're not
+going to be able to produce 10h yet and we have to go back up and implement
+something like it. Now one option here is we could actually implement
+exponentiation, right? And we could return the exp of a value instead of a 10h
+of a value. Because if we had exp, then we have everything else that we need.
+So because we know how to add and we know how to multiply, so we'd be able to
+create 10h if we knew how to exp. But for the purposes of this example, I
+specifically wanted to show you that we don't necessarily need to have the most
+atomic pieces in this value object. We can actually create functions at
+arbitrary points of abstraction. They can be complicated functions, but they
+can be also very, very simple functions like a plus. And it's totally up to us.
+The only thing that matters is that we know how to differentiate through any
+one function. So we take some inputs and we make an output. The only thing that
+matters can be arbitrarily complex function. as long as you know how to create
+the local derivative. If you know the local derivative of how the inputs impact
+the output, then that's all you need. So we're going to cluster up all of this
+expression, and we're not going to break it down to its atomic pieces. We're
+just going to directly implement tanh. So let's do that. Depth tanh, and then
+out will be a value of, and we need this expression here. So let me actually
+copy-paste. Let's grab n, which is a solve.theta. And then this, I believe, is
+the 10h. Math.exp of n minus 1 over 2n plus 1. Maybe I can call this x, just so
+that it matches exactly. okay and now this will be T and children of this node
+there's just one child and I'm wrapping it in a tuple so this is a tuple of one
+object just self and here the name of this operation will be 10h and we're
+going to return that okay so now values should be implementing 10h and now we
+can scroll all the way down here and we can actually do n.tanh and that's going
+to return the tanh output of n and now we should be able to draw a dot of o not
+of n so let's see how that worked there we go and went through tanh to produce
+this output so now tanh is a sort of our little micro grad supported node here
+as an operation And as long as we know the derivative of 10H, then we'll be
+able to backpropagate through it. Now let's see this 10H in action. Currently,
+it's not squashing too much because the input to it is pretty low. So if the
+bias was increased to, say, 8, then we'll see that what's flowing into the 10H
+now is 2. And 10H is squashing it to 0.96. So we're already hitting the tail of
+this 10H. And it will sort of smoothly go up to 1 and then plateau out over
+there. Okay, so I'm going to do something slightly strange. I'm going to change
+this bias from 8 to this number 6.88 etc. And I'm going to do this for specific
+reasons because we're about to start back propagation and I want to make sure
+that our numbers come out nice. They're not like very crazy numbers They're
+nice numbers that we can sort of understand in our head. Let me also add those
+label. Oh It's short for output here So that's the R Okay, so 0.88 flows into
+10H, comes out 0.7, so on. So now we're going to do backpropagation, and we're
+going to fill in all the gradients. So what is the derivative O with respect to
+all the inputs here? And of course, in a typical neural network setting, what
+we really care about the most is the derivative of these neurons on the weights
+specifically, the W2 and W1, because those are the weights that we're going to
+be changing part of the optimization. And the other thing that we have to
+remember is here we have only a single neuron, but in the neural net you
+typically have many neurons and they're connected. So this is only like one
+small neuron, a piece of a much bigger puzzle, and eventually there's a loss
+function that sort of measures the accuracy of the neural net, and we're
+backpropagating with respect to that accuracy and trying to increase it. So
+let's start off backpropagation here in the end. What is the derivative of O
+with respect to O? The base case, sort of, we know always is that the gradient
+is just 1.0. So let me fill it in. And then let me split out the drawing
+function here. And then here, cell, clear this output here. Okay. so now when
+we draw O we'll see that O that grad is 1 so now we're going to backpropagate
+through the 10H so to backpropagate through 10H we need to know the local
+derivative of 10H so if we have that O is 10H of N then what is DO by DN now
+what you could do is you could come here and you could take this expression and
+you could do your calculus derivative taking and that would work but we can
+also just scroll down Wikipedia here into a section that hopefully tells us
+that derivative d by dx of 10h of x is any of these I like this one, 1 minus
+10h squared of x so this is 1 minus 10h of x squared, so basically what this is
+saying is that do by dn is 1 minus 10h of n squared. And we already have 10h of
+n, it's just o, so it's 1 minus o squared. So o is the output here. So the
+output is this number, o dot data is this number, and then what this is saying
+is that d o by d n is 1 minus this squared. So 1 minus o dot data squared is is
+0.5 conveniently. So the local derivative of this tanh operation here is 0.5.
+And so that would be do by dn. So we can fill in that n.grad is 0.5. We'll just
+fill it in. So this is exactly 0.5, 1.5. So now we're going to continue the
+backprop application. This is 0.5, and this is a plus node. So what is backprop
+going to do here? And if you remember our previous example, a plus is just a
+distributor of gradient. So this gradient will simply flow to both of these
+equally. And that's because the local derivative of this operation is 1 for
+every one of its nodes. So 1 times 0.5 is 0.5. so therefore we know that this
+node here which we called this it's grad it's just 0.5 and we know that b.grad
+is also 0.5 so let's set those and let's draw so those are 0.5 continuing we
+have another plus 0.5 again we'll just distribute so 0.5 will flow to both of
+these so we can set theirs x2w2 as well. That grad is 0.5 as well. And let's
+redraw. Pluses are my favorite operations to backpropagate through because it's
+very simple. So now what's flowing into these expressions is 0.5. And so
+really, again, keep in mind what the derivative is telling us at every point in
+time along here. This is saying that if we want the output of this neuron to
+increase, then the influence on these expressions is positive on the output.
+Both of them are positive contribution to the output. So now backpropagating to
+x2 and w2 first. This is a times node, so we know that the local derivative is
+the other term. So if we want to calculate x2.grad, then can you think through
+what it's going to be? so x2.grad will be w2.data times this x2.w2.grad right
+and w2.grad will be x2.data times x2.w2.grad right so that's the local piece of
+chain rule let's set them and let's redraw so here we see that the gradient on
+our weight 2 is 0 because x2's data was 0 but x2 will have the gradient 0.5
+because data here was 1 and so what's interesting here is because the input x2
+was 0 and because of the way the times works of course this gradient will be 0
+and think about intuitively why that is derivative always tells us the
+influence of this on the final output. If I wiggle w2, how is the output
+changing? It's not changing because we're multiplying by zero. So because it's
+not changing, there is no derivative and zero is the correct answer because
+we're squashing that zero. And let's do it here. 0.5 should come here and flow
+through this times and so we'll have that x1.grad is can you think through a
+little bit what this should be? The local derivative of times with respect to
+x1 is going to be w1 so w1's data times x1 w1 dot grad and w1.grad will be
+x1.data times x1 w2 w1.grat. Let's see what those came out to be. So this is
+0.5, so this would be negative 1.5, and this would be 1. And we've
+back-propagated through this expression. These are the actual final
+derivatives. So if we want this neuron's output to increase, we know that
+what's necessary is that w2, we have no gradient. w2 doesn't actually matter to
+this neuron right now, but this neuron, this weight should go up. So if this
+weight goes up, then this neuron's output would have gone up and proportionally
+because the gradient is one.

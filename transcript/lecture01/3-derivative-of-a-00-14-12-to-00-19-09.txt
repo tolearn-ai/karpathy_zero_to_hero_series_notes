@@ -1,0 +1,50 @@
+look at a bit more complex case. So we're going to start you know complexifying
+a bit. So now we have a function here with output variable b that is a function
+of three scalar inputs a, b, and c. So a, b, and c are some specific values,
+three inputs into our expression graph, and a single output d. And so if we
+just print d we get four. And now what I have to do is I'd like to again look
+at at the derivatives of d with respect to a b and c and think through again
+just the intuition of what this derivative is telling us so in order to
+evaluate this derivative we're going to get a bit hacky here we're going to
+again have a very small value of h and then we're going to fix the inputs at
+some values that we're interested in so these are the this is the point a b c
+at which we're we're going to be evaluating the derivative of D with respect to
+all a, b, and c at that point. So there's the inputs, and now we have D1 is
+that expression, and then we're going to, for example, look at the derivative
+of D with respect to a. So we'll take a, and we'll bump it by h, and then we'll
+get D2 to be the exact same function, and now we're going to print, you know,
+func f1, d1 is d1, d2 is d2, and print slope. So the derivative or slope here
+will be, of course, d2 minus d1 divided h. So d2 minus d1 is how much the
+function increased when we bumped the specific input that we're interested in
+by a tiny amount. And this is then normalized by h to get the slope. So, yeah.
+So I just run this. We're going to print d1, which we know is 4. now d2 will be
+bumped a will be bumped by h so let's just think through a little bit what d2
+will be printed out here in particular d1 will be 4 will d2 be a number
+slightly greater than 4 or slightly lower than 4 and that's going to tell us
+the sign of the derivative so we're bumping a by h b is minus 3, c is 10. So
+you can just intuitively think through the derivative and what it's doing. a
+will be slightly more positive, but b is a negative number. So if a is slightly
+more positive, because b is negative 3, we're actually going to be adding less
+to d. So you'd actually expect that the value of the function will go down. so
+let's just see this and so we went from 4 to 3.9996 and that tells you that the
+slope will be negative and then will be a negative number because we went down
+and then the exact number of slope will be, exact number of slope is negative 3
+and you can also convince yourself that negative 3 is the right answer
+mathematically and analytically because if you have a times b plus c and you
+are, you know, you have calculus then differentiating a times b plus c with
+respect to a gives you just b and indeed the value of b is negative 3 which is
+the derivative that we have so you can tell that that's correct. So now if we
+do this with b so if we bump b by a little bit in a positive direction we'd get
+different slopes so what is the influence of b on the output d so if we bump b
+by a tiny amount in a positive direction, then because A is positive, we'll be
+adding more to D, right? So, and now what is the sensitivity? What is the slope
+of that addition? And it might not surprise you that this should be 2. And why
+is it 2? Because D of D by DB, differentiating with respect to B, would give us
+A. And the value of A is 2. So that's also working well. And then if C gets
+bumped a tiny amount in H by H. Then of course A times B is unaffected and now
+C becomes slightly bit higher. What does that do to the function? It makes it
+slightly bit higher because we're simply adding C and it makes it slightly bit
+higher by the exact same amount that we added to C and so that tells you that
+the slope is 1. That will be the rate at which D will increase as we scale c.
+Okay, so we now have some intuitive sense of what this derivative is telling
+you about the function.

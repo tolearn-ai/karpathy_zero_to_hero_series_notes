@@ -1,0 +1,52 @@
+And the second note is, if I come here, remember the smoothing where we added
+fake counts to our counts in order to smooth out and make more uniform the
+distributions of these probabilities, and that prevented us from assigning zero
+probability to any one bigram. Now if I increase the count here, what's
+happening to the probability? As I increase the count, probability becomes more
+and more uniform, right? Because these counts go only up to like 900 or
+whatever. So if I'm adding plus a million to every single number here, you can
+see how the row and its probability then when you divide is just going to
+become more and more close to exactly even probability, uniform distribution.
+
+It turns out that the gradient-based framework has an equivalent to smoothing.
+In particular, think through these w's here which we initialized randomly. We
+could also think about initializing w's to be zero. If all the entries of w are
+zero then you'll see that logits will become all zero and then exponentiating
+those logits becomes all one and then the probabilities turn out to be exactly
+uniform. So basically when w's are all equal to each other or say especially
+zero then the probabilities come out completely uniform.
+
+So trying to incentivize w to be near zero is basically equivalent to label
+smoothing and the more you incentivize that in the loss function the more
+smooth distribution you're going to achieve. So this brings us to something
+that's called regularization where we can actually augment the loss function to
+have a small component that we call a regularization loss. In particular what
+we're going to do is we can take w and we can for example square all of its
+entries and then we can whoops sorry about that we can take all the entries of
+w and we can sum them and because we're squaring there will be no signs anymore
+negatives and positives all get squashed to be positive numbers and then the
+way this works is you achieve zero loss if w is exactly or zero but if w has
+non-zero numbers you accumulate loss and so we can actually take this and we
+can add it on here so we can do something like loss plus w square dot sum or
+let's actually instead of sum let's take a mean because otherwise the sum gets
+too large so mean is like a little bit more manageable.
+
+And then we have a regularization loss here, like say 0.01 times or something
+like that. You can choose the regularization strength and then we can just
+optimize this. And now this optimization actually has two components. Not only
+is it trying to make all the probabilities work out, but in addition to that
+there's an additional component that simultaneously tries to make all w's be
+zero. Because if w's are not zero you feel a loss and so minimizing this, the
+only way to achieve that is for w to be zero.
+
+And so you can think of this as adding like a spring force or like a gravity
+force that pushes w to be zero. So w wants to be zero and the probabilities
+want to be uniform, but they also simultaneously want to match up your
+probabilities as indicated by the data. And so the strength of this
+regularization is exactly controlling the amount of counts that you add here.
+Adding a lot more counts here corresponds to increasing this number. Because
+the more you increase it, the more this part of the loss function dominates
+this part, and the more these weights will be unable to grow. Because as they
+grow, they accumulate way too much loss. And so if this is strong enough then
+we are not able to overcome the force of this loss and we will never and
+basically everything will be uniform predictions so I thought that's kind of

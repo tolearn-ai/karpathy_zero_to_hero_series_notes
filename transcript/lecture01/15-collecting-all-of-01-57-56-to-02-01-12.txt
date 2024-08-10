@@ -1,0 +1,30 @@
+Okay, so now we're going to want some convenience codes to gather up all of the
+parameters of the neural net so that we can operate on all of them
+simultaneously. And every one of them, we will nudge a tiny amount based on the
+gradient information. So let's collect the parameters of the neural net all in
+one array. So let's create a parameters of self that just returns self.w, which
+is a list, concatenated with a list of self.b. So this will just return a list.
+List plus list just gives you a list. So that's parameters of neuron. And I'm
+calling it this way because also PyTorch has parameters on every single NN
+module. And it does exactly what we're doing here. It just returns the
+parameter tensors. For us, it's the parameter scalars. Now layer is also a
+module, so it will have parameters. cell and basically what we want to do here
+is something like this like params is here and then for neuron in soft.neurons
+we want to get neuron.parameters and we want to params.extend right so these
+are the parameters of this neuron and then we want to put them on top of params
+so params dot extend of piece and then we want to return params so this there's
+way too much code so actually there's a way to simplify this which is return p
+for neuron in self dot neurons for p in neuron dot parameters So it's a single
+list comprehension. In Python, you can sort of nest them like this, and you can
+then create the desired array. So these are identical. We can take this out.
+And then let's do the same here. def parameters self and return a parameter for
+layer in self.layers for p in layer.parameters. And that should be good. Now
+let me pop out this so we don't re-initialize our network because we need to
+re-initialize our... Okay, so unfortunately, we will have to probably
+re-initialize the network because we just had functionality because this class
+of course we I want to get all the end up parameters but that's not going to
+work because this is the old class okay so unfortunately we do have to
+reinitialize the network which will change some of the numbers but let me do
+that so that we pick up the new API we can now do end up parameters and these
+are all the weights and biases inside the entire neural net So in total, this
+MLP has 41 parameters.

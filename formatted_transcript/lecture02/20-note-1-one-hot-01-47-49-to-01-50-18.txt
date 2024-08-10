@@ -1,0 +1,26 @@
+to point out two more things. Number one, I want you to notice that this x-enc
+here, this is made up of one-hot vectors. And then those one-hot vectors are
+multiplied by this W matrix. And we think of this as multiple neurons being
+forwarded in a fully connected manner. But actually what's happening here is
+that, for example, if you have a one-hot vector here that has a 1 at say the
+fifth dimension, then because of the way the matrix multiplication works,
+multiplying that one-hot vector with w actually ends up plucking out the fifth
+row of w. Logits would become just the fifth row of w. And that's because of
+the way the matrix multiplication works. So that's actually what ends up
+happening. But that's actually exactly what happened before. Because remember
+all the way up here, we have a bigram. We took the first character, and then
+that first character indexed into a row of this array here. And that row gave
+us the probability distribution for the next character. So the first character
+was used as a lookup into a matrix here to get the probability distribution.
+Well, that's actually exactly what's happening here because we're taking the
+index, we're encoding it as one hot and multiplying it by W. So logits
+literally becomes the appropriate row of W and that gets just as before,
+exponentiated to create the counts and then normalized and becomes probability.
+So this W here is literally the same as this array here, but w remember is the
+log counts, not the counts, so it's more precise to say that w exponentiated,
+w.exp, is this array. But this array was filled in by counting and by basically
+populating the counts of bigrams, in the gradient-based framework we initialize
+it randomly and then we let the loss guide us to arrive at the exact same
+array. So this array exactly here is basically the array w at the end of
+optimization except we arrived at it piece by piece by following the loss and
+that's why we also obtain the same loss function at the end.

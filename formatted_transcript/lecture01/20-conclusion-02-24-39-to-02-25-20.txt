@@ -1,0 +1,11 @@
+
+And that is everything that I wanted to cover in this lecture. So I hope you
+enjoyed building out micrograd with me. I hope you find it interesting,
+insightful. And yeah, I will post a lot of the links that are related to this
+video in the video description below. I will also probably post a link to a
+discussion forum or discussion group where you can ask questions related to
+this video. And then I can answer or someone else can answer your questions. I
+may also do a follow-up video that answers some of the most common questions.
+But for now, that's it. I hope you enjoyed it; if you did, then please like and
+subscribe so that YouTube knows to feature this video to more people. And
+that's it for now; I'll see you later.

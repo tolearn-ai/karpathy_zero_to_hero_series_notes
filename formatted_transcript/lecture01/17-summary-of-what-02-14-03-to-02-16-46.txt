@@ -1,0 +1,49 @@
+
+So let's now bring everything together and summarize what we learned. What are
+neural nets? Neural nets are these mathematical expressions, fairly simple
+mathematical expressions in the case of multilayered perceptron, that take
+input as the data, and they take input the weights and the parameters of the
+neural net.
+
+Mathematical expression for the forward pass, followed by a loss function, and
+the loss function tries to measure the accuracy of the predictions. Usually,
+the loss will be low when your predictions are matching your targets or where
+the network is basically behaving well. So we manipulate the loss function so
+that when the loss is low, the network is doing what you want it to do on your
+problem.
+
+Then we backward the loss, use backpropagation to get the gradient, and then we
+know how to tune all the parameters to decrease the loss locally. But then we
+have to iterate that process many times in what's called gradient descent. So
+we simply follow the gradient information, and that minimizes the loss,
+arranged so that when the loss is minimized, the network is doing what you want
+it to do.
+
+And yeah, so we just have a blob of neural stuff, and we can make it do
+arbitrary things, and that's what gives neural nets their power. It's a very
+tiny network with 41 parameters, but you can build significantly more
+complicated neural nets with billions, at this point almost trillions, of
+parameters. It's a massive blob of simulated neural tissue, roughly speaking,
+and you can make it solve extremely complex problems.
+
+These neural nets then have all kinds of very fascinating emergent properties
+when you try to make them do significantly hard problems, as in the case of
+GPT, for example. We have massive amounts of text from the internet, and we're
+trying to get a neural net to predict, to take like a few words, and try to
+predict the next word in a sequence. That's the learning problem.
+
+It turns out that when you train this on all of the internet, the neural net
+actually has really remarkable emergent properties, but that neural net would
+have hundreds of billions of parameters. It works on fundamentally the exact
+same principles. The neural net, of course, will be a bit more complex, but
+otherwise, evaluating the gradient is there and would be identical. The
+gradient descent would also be basically identical.
+
+However, people usually use slightly different updates. This is a very simple
+stochastic gradient descent update, and the loss function would not be a mean
+squared error. They would be using something called the cross-entropy loss for
+predicting the next token. So there are a few more details, but fundamentally,
+the neural network setup and neural network training are identical and
+pervasive.
+
+And now you understand intuitively how that works under the hood.

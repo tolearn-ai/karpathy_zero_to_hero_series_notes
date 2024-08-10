@@ -1,0 +1,62 @@
+In the beginning of this video, I told you that by the end of it, you would
+understand everything in micrograd and then we'd slowly build it up. Let me
+briefly prove that to you. So I'm going to step through all the code that is in
+micrograd as of today. Actually, potentially some of the code will change by
+the time you watch this video because I intend to continue developing
+micrograd. But let's look at what we have so far at least. Init.py is empty.
+When you go to engine.py, that has the value. Everything here you should mostly
+recognize. So we have the .data, .grad attributes. We have the backward
+function. We have the previous set of children and the operation that produced
+this value. We have addition, multiplication, and raising to a scalar power. We
+have the ReLU non-linearity, which is a slightly different type of
+non-linearity than tanh that we used in this video. Both of them are
+non-linearities, and notably tanh is not actually present in micrograd as of
+right now, but I intend to add it later. We have the backward, which is
+identical, and then all of these other operations, which are built up on top of
+operations here. so values should be very recognizable except for the
+non-linearity used in this video there's no massive difference between relu and
+10h and sigmoid and these other non-linearities they're all roughly equivalent
+and can be used in MLPs so I use 10h because it's a bit smoother and because
+it's a little bit more complicated than relu and therefore it's stressed a
+little bit more the local gradients and working with those derivatives which I
+thought would be useful. nn.py is the neural networks library, as I mentioned,
+so you should recognize identical implementation of Neural, Layer, and MLP.
+Notably, or not so much, we have a class module here. There's a parent class of
+all these modules. I did that because there's an nn.module class in PyTorch,
+and so this exactly matches that API, and nn.module in PyTorch has also a zero
+grad, which I refactored out here. So that's the end of micrograd really. Then
+there's a test which you'll see basically creates two chunks of code, one in
+micrograd and one in PyTorch, and we'll make sure that the forward and the
+backward paths agree identically. For a slightly less complicated expression, a
+slightly more complicated expression, everything agrees. So we agree with
+PyTorch on all of these operations. And finally, there's a demo.ipyYMB here,
+and it's a bit more complicated binary classification demo than the one I
+covered in this lecture. So we only had a tiny data set of four examples. Here,
+we have a bit more complicated example with lots of blue points and lots of red
+points. And we're trying to, again, build a binary classifier to distinguish
+two-dimensional points as red or blue. It's a bit more complicated MLP here
+with it's a bigger MLP. The loss is a bit more complicated because it supports
+batches. So because our data set was so tiny, we always did a forward pass on
+the entire data set of four examples. But when your data set is like a million
+examples, what we usually do in practice is we basically pick out some random
+subset. We call that a batch. And then we only process the batch forward,
+backward, and update. So we don't have to forward the entire training set. So
+this supports batching because there's a lot more examples here. We do a
+forward pass. The loss is slightly more different. This is a max margin loss
+that I implement here. The one that we used was the mean squared error loss
+because it's the simplest one. There's also the binary cross entropy loss. All
+of them can be used for binary classification and don't make too much of a
+difference in the simple examples that we looked at so far. There's something
+called L2 regularization used here. This has to do with generalization of the
+neural net and controls the overfitting in machine learning setting, but I did
+not cover these concepts in this video, potentially later. And the training
+loop you should recognize. So forward, backward, with, zero grad, and update,
+and so on. You'll notice that in the update here, the learning rate is scaled
+as a function of number of iterations, and it shrinks. And this is something
+called learning rate decay. So in the beginning, you have a high learning rate
+and as the network sort of stabilizes near the end, you bring down the learning
+rate to get some of the fine details in the end. And in the end, we see the
+decision surface of the neural net and we see that it learns to separate out
+the red and the blue area based on the data points. So that's the slightly more
+complicated example in the demo.hypi.ymb that you're free to go over. But yeah,
+as of today, that is micrograd.

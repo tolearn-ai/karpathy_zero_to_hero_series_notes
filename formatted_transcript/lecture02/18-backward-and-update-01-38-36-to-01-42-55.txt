@@ -1,0 +1,54 @@
+Okay, so we made our way all the way to loss. We've defined the forward pass.
+We've forwarded the network and the loss. Now we're ready to do the backward
+pass.
+
+So backward pass we want to first make sure that all the gradients are reset so
+they're at zero. Now in PyTorch you can set the gradients to be zero, but you
+can also just set it to none, and setting it to none is more efficient. PyTorch
+will interpret none as like a lack of a gradient, and it is the same as zeros.
+So this is a way to set to 0, the gradient.
+
+And now we do loss.backward. Before we do loss.backward, we need one more
+thing. If you remember from microGrad, PyTorch actually requires that we pass
+in requiresGrad as true, so that we tell PyTorch that we are interested in
+calculating the gradient for this leaf tensor. By default, this is false.
+
+So let me recalculate with that and then set to none and loss.backward. Now
+something magical happened when loss.backward was run because PyTorch just like
+micrograd, when we did the forward pass here, it keeps track of all the
+operations under the hood. It builds a full computational graph just like the
+graphs we produced in micrograd. Those graphs exist inside PyTorch and so it
+knows all the dependencies and all the mathematical operations of everything.
+And when you then calculate the loss, we can call dot backward on it, and dot
+backward then fills in the gradients of all the intermediates all the way back
+to w's, which are the parameters of our neural net.
+
+So now we can do w.grad and we see that it has structure; there's stuff inside
+it. And these gradients, every single element here, so w.shape is 27 by 27,
+w.grad.shape is the same, 27 by 27. And every element of w.grad is telling us
+the influence of that weight on the loss function.
+
+So for example this number all the way here, if this element, the 0, 0 element
+of w, because the gradient is positive, it's telling us that this has a
+positive influence on the loss. Slightly nudging slightly taking w, 0, 0 and
+adding a small h to it would increase the loss mildly because this gradient is
+positive. Some of these gradients are also negative. So that's telling us about
+the gradient information and we can use this gradient information to update the
+weights of this neural network.
+
+So let's now do the update. It's going to be very similar to what we had in
+micrograd. We need no loop over all the parameters because we only have one
+parameter tensor, and that is w. So we simply do w.data plus equals. We can
+actually copy this almost exactly, negative 0.1 times w.grad. And that would be
+the update to the tensor.
+
+So that updates the tensor. And because the tensor is updated, we would expect
+that now the loss should decrease. So here, if I print loss.item, it was 3.76,
+right? So we've updated the w here so if I recalculate forward pass, loss now
+should be slightly lower, so 3.76 goes to 3.74. And then we can again set to
+set graph to none and backward update. And now the parameters changed again so
+if we recalculate the forward pass, we expect a lower loss again, 3.72.
+
+Okay, and this is again doing the we're now doing gradient descent. And when we
+achieve a low loss, that will mean that the network is assigning high
+probabilities to the correct next character.

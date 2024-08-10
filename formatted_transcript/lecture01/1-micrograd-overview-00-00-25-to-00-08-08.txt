@@ -1,0 +1,118 @@
+Take you through building of micrograd. Now, micrograd is this library that I
+released on GitHub about two years ago. But at the time, I only uploaded the
+source code, and you’d have to go in by yourself and really figure out how it
+works.
+
+So, in this lecture, I will take you through it step by step and kind of
+comment on all the pieces of it.
+
+So what’s micrograd and why is it interesting? Okay, micrograd is basically an
+autograd engine. Autograd is short for automatic gradient. What it does is it
+implements backpropagation. Now, backpropagation is this algorithm that allows
+you to efficiently evaluate the gradient of some kind of a loss function with
+respect to the weights of a neural network. What that allows us to do is we can
+iteratively tune the weights of that neural network to minimize the loss
+function and therefore improve the accuracy of the network. Backpropagation
+would be at the mathematical core of any modern deep neural network library,
+like say PyTorch or JAX.
+
+The functionality of micrograd is I think best illustrated by an example. So if
+we just scroll down here, you’ll see that micrograd basically allows you to
+build out mathematical expressions. Here, we have an expression that we’re
+building out where you have two inputs, a and b. You’ll see that a and b are
+negative four and two, but we are wrapping those values into this value object
+that we are going to build out as part of micrograd. This value object will
+wrap the numbers themselves.
+
+We are going to build out a mathematical expression where A and B are
+transformed into C, D, and eventually E, F, and G. I’m showing some of the
+functionality of micrograd and the operations that it supports. You can add two
+value objects, multiply them, raise them to a constant power, offset by one,
+negate, squash at zero, square, divide by constant, divide by it, etc. We’re
+building out an expression graph with these two inputs a and b, and we’re
+creating an output value of g. Micrograd will, in the background, build out
+this entire mathematical expression.
+
+It will, for example, know that c is also a value, c was a result of an
+addition operation, and the child nodes of c are a and b, and it will maintain
+pointers to a and b value objects. It will basically know exactly how all of
+this is laid out. Then, not only can we do what we call the forward pass, where
+we actually look at the value of g, of course that’s pretty straightforward, we
+will access that using the dot data attribute. So, the output of the forward
+pass, the value of g, is 24.7 it turns out.
+
+But the big deal is that we can also take this g value object and we can call
+dot backward. This will basically initialize backpropagation at the node g.
+What backpropagation is going to do is it’s going to start at g and it’s going
+to go backwards through that expression graph. It’s going to recursively apply
+the chain rule from calculus. What that allows us to do then is we’re going to
+evaluate the derivative of g with respect to all the internal nodes like e, d,
+and c, but also with respect to the inputs a and b. We can actually query this
+derivative of g with respect to a, for example, that’s a dot grad. In this
+case, it happens to be 138. And the derivative of g with respect to b, which
+also happens to be 645.
+
+This derivative we’ll see soon is very important information because it’s
+telling us how a and b are affecting g through this mathematical expression.
+Specifically, a.grad is 138. So, if we slightly nudge a and make it slightly
+larger, 138 is telling us that g will grow, and the slope of that growth is
+going to be 138. And the slope of growth of b is going to be 645. So, that’s
+going to tell us about how g will respond if a and b get tweaked a tiny amount
+in a positive direction.
+
+Okay. Now, you might be confused about what this expression is that we built
+out here. By the way, this expression is completely meaningless. I just made it
+up. I’m just flexing about the kinds of operations that are supported by
+micrograd. What we actually really care about are neural networks. But it turns
+out that neural networks are just mathematical expressions, just like this one,
+but actually a slightly bit less crazy even. Neural networks are just a
+mathematical expression. They take the input data as an input, and they take
+the weights of a neural network as an input. It’s a mathematical expression,
+and the output is your predictions of your neural net or the loss function.
+We’ll see this in a bit. Basically, neural networks just happen to be a certain
+class of mathematical expressions. But backpropagation is actually
+significantly more general. It doesn’t actually care about neural networks at
+all. It only cares about arbitrary mathematical expressions, and then we happen
+to use that machinery for training of neural networks.
+
+Now, one more note I would like to make at this stage is that, as you see here,
+micrograd is a scalar valued autograd engine. It’s working on the level of
+individual scalars like negative four and two, and we’re taking neural nets and
+we’re breaking them down all the way to these atoms of individual scalars and
+all the little pluses and times. It’s just excessive. Obviously, you would
+never be doing any of this in production. It’s really just done for pedagogical
+reasons because it allows us to not have to deal with these n-dimensional
+tensors that you would use in modern deep neural network libraries. This is
+really done so that you understand and refactor out background application and
+chain rule and understanding of neural training. Then, if you actually want to
+train bigger networks, you have to be using these tensors. But none of the math
+changes. This is done purely for efficiency. We are basically taking scalar
+values, packaging them up into tensors which are just arrays of these scalars.
+Then, because we have these large arrays, we’re making operations on those
+large arrays that allow us to take advantage of the parallelism in a computer.
+All those operations can be done in parallel, and then the whole thing runs
+faster. But really, none of the math changes, and it’s done purely for
+efficiency.
+
+So, I don’t think that it’s pedagogically useful to be dealing with tensors
+from scratch. That’s why I fundamentally wrote micrograd because you can
+understand how things work at the fundamental level and then you can speed it
+up later.
+
+Okay, so here’s the fun part. My claim is that micrograd is what you need to
+train neural networks, and everything else is just efficiency. You’d think that
+micrograd would be a very complex piece of code, and that turns out to not be
+the case. If we just go to micrograd, you’ll see that there’s only two files
+here in micrograd. This is the actual engine; it doesn’t know anything about
+neural nets. And this is the entire neural nets library on top of micrograd.
+So, engine and nn.py. The actual backpropagation autograd engine that gives you
+the power of neural networks is literally 100 lines of code of very simple
+Python, which we’ll understand by the end of this lecture. Then, nn.py, this
+neural network library built on top of the autograd engine, is like a joke. We
+have to define what is a neuron, then we have to define what is a layer of
+neurons, and then we define what is a multilayer perceptron, which is just a
+sequence of layers of neurons. It’s just a joke. So basically, there's a lot of
+power that comes from only 150 lines of code. And that's all you need to
+understand to understand neural network training and everything else is just
+efficiency. And of course, there's a lot to efficiency, but fundamentally,
+that's all that's happening.

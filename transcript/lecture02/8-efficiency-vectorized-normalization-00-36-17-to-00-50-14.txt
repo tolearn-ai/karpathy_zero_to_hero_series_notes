@@ -1,0 +1,157 @@
+I would like to fix an inefficiency that we have going on here because what
+we're doing here is we're always fetching a row of n from the counts matrix up
+ahead and then we're always doing the same things we're converting to float and
+we're dividing and we're doing this every single iteration of this loop and we
+just keep renormalizing these rows over and over again and it's extremely
+inefficient and wasteful so what I'd like to do is I'd like to actually prepare
+a matrix capital P that will just have the probabilities in it so in other
+words it's is going to be the same as the capital N matrix here of counts, but
+every single row will have the row of probabilities that is normalized to one,
+indicating the probability distribution for the next character given the
+character before it as defined by which row we're in. So basically what we'd
+like to do is we'd like to just do it up front here, and then we would like to
+just use that row here. So here we would like to just do p equals p of ix
+instead. Okay. The other reason I want to do this is not just for efficiency,
+but also I would like us to practice these n-dimensional tensors, and I'd like
+us to practice their manipulation, and especially something that's called
+broadcasting that we'll go into in a second. We're actually going to have to
+become very good at these tensor manipulations because if we're going to build
+out all the way transformers we're going to be doing some pretty complicated
+array operations for efficiency and we need to really understand that and be
+very good at it so intuitively what we want to do is we first want to grab the
+floating point copy of n and i'm mimicking the line here basically and then we
+want to divide all the rows so that they sum to one so we'd like to do
+something like this p p.sum but now we have to be careful because p.sum
+actually produces a sum sorry p equals n.floatcopy p.sum produces a sums up all
+of the counts of this entire matrix n and gives us a single number of just the
+summation of everything so that's not the way we want to divide we want
+simultaneously and in parallel divide all the rows by their respective sums. So
+what we have to do now is we have to go into documentation for torch.sum and we
+can scroll down here to a definition that is relevant to us which is where we
+don't only provide an input array that we want to sum but we also provide the
+dimension along which we want to sum and in particular we want to sum up over
+rows right now one more argument that I want you to pay attention to here is
+the keep them as false if keep them is true and the output tensor is of the
+same size as input except of course the dimension along which you summed which
+will become just one but if you pass in keep them as false then this dimension
+is squeezed out and so torch.sum not only does the sum and collapses dimension
+to be of size one but in addition it does what's called a squeeze where it
+squeeze out it squeezes out that dimension so basically what we want here is we
+instead want to do p.sum of sumaxis and in particular notice that p.shape is 27
+by 27 so when we sum up across axis 0 then we would be taking the 0th dimension
+and we would be summing across it so when keepdim is true then this thing will
+not only give us the counts across along the columns but notice that basically
+the shape of this is 1 by 27 we just get a row vector and the reason we get a
+row vector here again is because we pass in 0 dimension so this 0 dimension
+becomes 1 and we've done a sum and we get a row and so basically we've done the
+sum this way vertically and arrived at just a single 1 by 27 vector of counts.
+What happens when you take out keep them is that we just get 27 so it squeezes
+out that dimension and we just get a one dimensional vector of size 27. Now we
+don't actually want 1 by 27 row vector because that gives us the counts or the
+sums across the columns. We actually want to sum the other way along dimension
+1 and you'll see that the shape of this is 27 by 1 so it's a column vector it's
+a 27 by 1 vector of counts okay and that's because what's happened here is that
+we're going horizontally and this 27 by 27 matrix becomes a 27 by 1 array now
+you'll notice by the way that the actual numbers of these counts are identical
+and that's because this special array of counts here comes from bigram
+statistics and actually it just so happens by chance or because of the way this
+array is constructed that this sums along the columns or along the rows
+horizontally or vertically is identical but actually what we want to do in this
+case is we want to sum across the rows horizontally So what we want here is p
+dot sum of 1 with keepDim true, 27 by 1 column vector. And now what we want to
+do is we want to divide by that. Now we have to be careful here again. Is it
+possible to take what's a p dot shape you see here, 27 by 27. Is it possible to
+take a 27 by 27 array and divide it by what is a 27 by 1 array? Is that an
+operation that you can do? And whether or not you can perform this operation is
+determined by what's called broadcasting rules. So if you just search
+broadcasting semantics in Torch, you'll notice that there's a special
+definition for what's called broadcasting, that for whether or not these two
+arrays can be combined in a binary operation like division. So the first
+condition is each tensor has at least one dimension, which is the case for us.
+And then when iterating over the dimension sizes starting at the trailing
+dimension The dimension sizes must either be equal one of them is one or one of
+them does not exist Okay, so let's do that We need to align the two arrays and
+their shapes which is very easy because both of these shapes have two elements
+So they're aligned then we iterate over from the from the right and going to
+the left Each dimension must be either equal one of them is a one or one of
+them does not exist So in this case, they're not equal, but one of them is a 1.
+So this is fine. And then this dimension, they're both equal. So this is fine.
+So all the dimensions are fine, and therefore this operation is broadcastable.
+So that means that this operation is allowed. And what is it that these arrays
+do when you divide 27 by 27 by 27 by 1? What it does is that it takes this
+dimension 1, and it stretches it out. it copies it to match 27 here in this
+case. So in our case, it takes this column vector, which is 27 by 1, and it
+copies it 27 times to make these both be 27 by 27 internally. You can think of
+it that way. And so it copies those counts, and then it does an element-wise
+division, which is what we want, because these counts, we want to divide by
+them on every single one of these columns in this matrix. So this actually we
+expect will normalize every single row. And we can check that this is true by
+taking the first row, for example, and taking its sum. We expect this to be 1
+because it's now normalized. And then we expect this now because if we actually
+correctly normalize all the rows, we expect to get the exact same result here.
+So let's run this. It's the exact same result. So this is correct. So now I
+would like to scare you a little bit. You actually have to like, I basically
+encourage you very strongly to read through broadcasting semantics. And I
+encourage you to treat this with respect. And it's not something to play fast
+and loose with. It's something to really respect, really understand, and look
+up maybe some tutorials for broadcasting and practice it. And be careful with
+it because you can very quickly run into bugs. Let me show you what I mean. You
+see how here we have p.sum , keep them as true. is true. The shape of this is
+27 by 1. Let me take out this line just so we have the n and then we can see
+the counts. We can see that this is all the counts across all the rows and it's
+a 27 by 1 column vector, right? Now suppose that I tried to do the following
+but I erase keep them as true here. What does that do? If keep them is not
+true, it's false. Then remember according to documentation it gets rid of this
+dimension 1, it squeezes it out so basically we just get all the same counts,
+the same result, except the shape of it is not 27 by 1, it is just 27, the one
+disappears. But all the counts are the same so you'd think that this, divide
+that, would work. First of all can we even write this and is it even expected
+to run? Is it broadcastable. Let's determine if this result is broadcastable.
+p.summit1 is shape, is 27. This is 27 by 27. So 27 by 27 broadcasting into 27.
+So now rules of broadcasting, number one, align all the dimensions on the
+right, done. Now iteration over all the dimensions starting from the right
+going to the left. All the dimensions must either be equal, one of them must be
+one, or one that does not exist. So here they are all equal. Here the dimension
+does not exist. So internally what broadcasting will do is it will create a one
+here and then we see that one of them is a one and this will get copied and
+this will run, this will broadcast. Okay, so you'd expect this to work because
+we are... this broadcasts and we can divide this. Now if I run this, you'd
+expect it to work, but it doesn't. You actually get garbage. You get a wrong
+result because this is actually a bug. This keep them equals true makes it
+work. This is a bug. In both cases, we are doing the correct counts. We are
+summing up across the rows, but keep them is saving us and making it work. So
+in this case, I'd like to encourage you to potentially pause this video at this
+point and try to think about why this is buggy and why the keepdemo is
+necessary here. Okay. So the reason for this is I'm trying to hint it here when
+I was giving you a bit of a hint on how this works. This 27 vector internally
+inside the broadcasting, this becomes a 1 by 27. And 1 by 27 is a row vector,
+right? and now we are dividing 27 by 27 by 1 by 27 and Torch will replicate
+this dimension. So basically it will take It will take this row vector and it
+will copy it vertically now 27 times so the 27 by 27 aligns exactly and
+element-wise divides and so basically what's happening here is We're actually
+normalizing the columns instead of normalizing the rows So you can check that
+what's happening here is that p at 0, which is the first row of p, dot sum is
+not 1, it's 7. It is the first column, as an example, that sums to 1. So to
+summarize, where does the issue come from? The issue comes from the silent
+adding of a dimension here, because in broadcasting rules, you align on the
+right and go from right to left, and if the dimension doesn't exist, you create
+it. So that's where the problem happens. we still did the counts correctly. We
+did the counts across the rows and we got the counts on the right here as a
+column vector. But because the keep dims was true this dimension was discarded
+and now we just have a vector of 27. And because of broadcasting the way it
+works this vector of 27 suddenly becomes a row vector. And then this row vector
+gets replicated vertically and at every single point we are dividing by the
+count in the opposite direction. so this thing just doesn't work this needs to
+be keepDimSql true in this case so then we have that p at 0 is normalized and
+conversely the first column you'd expect to potentially not be normalized and
+this is what makes it work so pretty subtle and hopefully this helps to scare
+you that you should have respect for broadcasting be careful, check your work
+and understand how it works under the hood and make sure that it's broadcasting
+in the direction that you like. Otherwise, you're going to introduce very
+subtle bugs, very hard to find bugs, and just be careful. One more note on
+efficiency. We don't want to be doing this here because this creates a
+completely new tensor that we store into P. We prefer to use in-place
+operations if possible. So this would be an in-place operation. It has the
+potential to be faster. It doesn't create new memory under the hood. and then
+let's erase this. We don't need it. And let's also just do fewer just so I'm
+not wasting space.

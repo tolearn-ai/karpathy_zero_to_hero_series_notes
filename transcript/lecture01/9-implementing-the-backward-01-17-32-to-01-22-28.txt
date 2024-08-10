@@ -1,0 +1,50 @@
+So we have one last piece to get rid of, which is us calling underscore
+backward manually. So let's think through what we are actually doing. We've
+laid out a mathematical expression, and now we're trying to go backwards
+through that expression. So going backwards through the expression just means
+that we never want to call a dot backward for any node before we've done sort
+of everything after it. So we have to do everything after it before we're ever
+going to call .backward on any one node. We have to get all of its full
+dependencies. Everything that it depends on has to propagate to it before we
+can continue backpropagation. So this ordering of graphs can be achieved using
+something called topological sort. So topological sort is basically a laying
+out of a graph such that all the edges go only from left to right, basically.
+So here we have a graph, it's a direct acyclic graph, a DAG, and this is two
+different topological orders of it, I believe, where basically you'll see that
+it's a laying out of the nodes such that all the edges go only one way from
+left to right. And implementing topological sort, you can look in Wikipedia and
+so on. I'm not going to go through it in detail. But basically, this is what
+builds a topological graph. We maintain a set of visited nodes and then we are
+going through starting at some root node which for us is O. That's where I want
+to start the topological sort and starting at O we go through all of its
+children and we need to lay them out from left to right and basically this
+starts at O. If it's not visited then it marks it as visited and then it
+iterates through all of its children and calls build topological on them and
+then after it's gone through all the children it adds itself so basically this
+node that we're going to call it on like say o is only going to add itself to
+the topo list after all of the children have been processed and that's how this
+function is guaranteeing that you're only going to be in the list once all your
+children are in the list and that's the invariant that is being maintained so
+if we build topo on o and then inspect this list, we're going to see that it
+ordered our value objects. And the last one is the value of 0.707, which is the
+output. So this is O, and then this is N, and then all the other nodes get laid
+out before it. So that builds the topological graph. And really what we're
+doing now is we're just calling dot underscore backward on all of the nodes in
+a topological order. So if we just reset the gradients, they're all zero, what
+did we do? We started by setting o.grad to be 1. That's the base case. Then we
+built a topological order. And then we went for node in reversed of topo. now
+in the reverse order because this list goes from you know we need to go through
+it in reversed order so starting at o node.backward and this should be it there
+we go those are the correct derivatives finally we are going to hide this
+functionality so I'm going to copy this and we're going to hide it inside the
+value class because we don't want to have all that code lying around. So
+instead of an underscore backward, we're now going to define an actual
+backward. So that's backward without the underscore. And that's going to do all
+the stuff that we just arrived. So let me just clean this up a little bit. So
+we're first going to build a topological graph starting at self so build topo
+of self will populate the topological order into the topo list which is a local
+variable then we set self.grat to be one and then for each node in the reversed
+list so starting at us and going to all the children underscore backward and
+that should be it so save come down here redefine okay all the grads are zero
+and now what we can do is odot backward without the underscore and there we go
+and that's back propagation place for one neuron Thank you.

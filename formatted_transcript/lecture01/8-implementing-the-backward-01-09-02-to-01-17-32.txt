@@ -1,0 +1,90 @@
+Okay, so doing the backpropagation manually is obviously ridiculous. So we are
+now going to put an end to this suffering. And we're going to see how we can
+implement the backward pass a bit more automatically. We're not going to be
+doing all of it manually out here. It's now pretty obvious to us by example how
+these pluses and times are backpropagating ingredients.
+
+So let's go up to the value object. And we're going to start codifying what
+we've seen in the examples below. So we're going to do this by storing a
+special self.backward and underscore backward, and this will be a function
+which is going to do that little piece of chain rule at each little node that
+took inputs and produced output. We're going to store how we are going to chain
+the outputs gradient into the inputs gradients. So by default this will be a
+function that doesn't do anything. You can also see that here in the value in
+micro grad, so with this backward function by default doesn't do anything. This
+is a complete function, and that would be sort of the case, for example, for a
+leaf node. For a leaf node, there's nothing to do.
+
+But now if when we're creating these out values, these out values are an
+addition of self and other, and so we will want to set outs backward to be the
+function that propagates the gradient. So let's define what should happen, and
+we're going to store it in a closure. Let's define what should happen when we
+call outs grad. For addition, our job is to take outs grad and propagate it
+into selfs grad and other.grad. So basically we want to self.grad to something,
+and we want to set others.grad to something.
+
+Okay, and the way we saw below how chain rule works, we want to take the local
+derivative times the sort of global derivative, I should call it, which is the
+derivative of the final output of the expression with respect to out's data.
+With respect to out, the local derivative of self in an addition is 1.0. So
+it's just 1.0 times outs grad. That's the chain rule. And others.grad will be
+1.0 times out grad. Basically what you're seeing here is that outs grad will
+simply be copied onto self's grad and others grad, as we saw happens for an
+addition operation.
+
+So we're going to later call this function to propagate the gradient, having
+done an addition. Let's now do multiplication. We're going to also define
+out.backward, and we're going to set its backward to be backward, and we want
+to chain outgrad into self.grad and others.grad. This will be a little piece of
+chain rule for multiplication, so what should this be? Can you think through
+what the local derivative here is? The local derivative was others.data and
+then times out.grad, that's channel, and here we have self.data times out.grad.
+That's what we've been doing.
+
+Finally, here for 10h def backward, we want to set out.backward to be just
+backward, and here we need to back propagate. We have out.grad, and we want to
+chain it into self.grad, and self.grad will be the local derivative of this
+operation that we've done here, which is 10h. We saw that the local gradient is
+1 minus the 10h of x squared, which here is t. That's the local derivative
+because t is the output of this 10h. So, 1 minus t square is the local
+derivative, and then the gradient has to be multiplied because of the chain
+rule.
+
+So outGrad is chained through the local gradient into self.grad. And that
+should be basically it. We’re going to redefine our value node. We're going to
+swing all the way down here, and we're going to redefine our expression, make
+sure that all the grads are zero. Okay, but now we don't have to do this
+manually anymore. We are going to basically be calling the dot backward in the
+right order. So first we want to call o's dot backward. So o was the outcome of
+10h, right?
+
+Calling o's dot backward will be this function. This is what it will do. Now we
+have to be careful because there's a times out.grad, and out.grad, remember, is
+initialized to 0. So here we see grad 0. As a base case, we need to set o.grad
+to 1.0 to initialize this with 1, and then once this is 1, we can call O dot
+backward, and what that should do is it should propagate this grad through 10h.
+So the local derivative times the global derivative, which is initialized at 1,
+so this should... Dope. So I thought about redoing it, but I figured I should
+just leave the error in here because it's pretty funny. Why is an anti-object
+not callable?
+
+It's because I screwed up. We're trying to save these functions. So this is
+correct. This here, we don't want to call the function because that returns
+none. These functions return none. We just want to store the function. So let
+me redefine the value object. And then we're going to come back in, redefine
+the expression, draw dot, everything is great, o.grad is 1, o.grad is 1, and
+now this should work, of course. So o.backward, this grad should now be 0.5,
+and if we redraw, and if everything went correctly, 0.5, yay.
+
+Okay, so now we need to call n's grad, n's backward, sorry, n's backward. That
+seems to have worked, so n's dot backward routed the gradient to both of these,
+so this is looking great. Now we could of course call b dot backward. What's
+going to happen? Well, b doesn't have a backward; b's backward, because b is a
+leaf node, is by initialization the empty function, so nothing would happen.
+But we can call it, but when we call this one, it's backward, then we expect
+this 0.5 to get further routed right. So there we go, 0.5, 0.5, and then
+finally we want to call it here on x2 w2 and on x1 w1. Let's do both of those,
+and there we go.
+
+So we get 0, 0.5, negative 1.5, and 1, exactly as we did before, but now we've
+done it through calling that backward sort of manually.

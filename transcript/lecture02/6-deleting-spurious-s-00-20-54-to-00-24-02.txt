@@ -1,0 +1,34 @@
+Now if you scrutinize this carefully, you will notice that we're not actually
+being very clever. That's because when you come over here, you'll notice that
+for example we have an entire row of completely zeros, and that's because the
+end character is never possibly going to be the first character of a bigram,
+because we're always placing these end tokens all at the end of a bigram.
+Similarly, we have entire column zeros here because the s character will never
+possibly be the second element of a bigram because we always start with s and
+we end with e and we only have the words in between. So we have an entire
+column of zeros, an entire row of zeros, and in this little two by two matrix
+here as well, the only one that can possibly happen is if s directly follows e.
+That can be non-zero if we have a word that has no letters. So in that case,
+there's no letters in the word, it's an empty word, and we just have s follows
+e. But the other ones are just not possible. And so we're basically wasting
+space and not only that but the S and the E are getting very crowded here I was
+using these brackets because there's convention in natural language processing
+to use these kinds of brackets to denote special tokens But we're going to use
+something else So let's fix all this and make it prettier We're not actually
+going to have two special tokens. We're only going to have one special token So
+we're going to have n by n array of 27 by set 27 instead instead of having two
+we will just have one and I will call it a dot okay let me swing this over here
+now one more thing that I would like to do is I would actually like to make
+this special character half position zero and I would like to offset all the
+other letters off I find that a bit more pleasing. So we need a plus one here
+so that the first character which is a will start at 1. So s2i will now be a
+starts at 1 and dot is 0 and i2s of course we're not changing this because i2s
+just creates a reverse mapping and this will work fine. So 1 is a, 2 is b, 0 is
+dot. So we've reversed that here we We have a dot and a dot. This should work
+fine. Make sure I start at zeros. Count and then here we don't go up to 28, we
+go up to 27 and this should just work. Okay. So we see that dot dot never
+happened. It's at zero because we don't have empty words. this row here now is
+just very simply the counts for all the first letters. So j starts a word, h
+starts a word, i starts a word, etc. And then these are all the ending
+characters. And in between we have the structure of what characters follow each
+other. So this is the counts array of our entire dataset.

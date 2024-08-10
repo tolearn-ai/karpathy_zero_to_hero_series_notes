@@ -1,0 +1,26 @@
+Now think through this. When I take Andre and I append q and I test the
+probability of it, Andreq, we actually get infinity and that's because jq has a
+zero percent probability according to our model. So the log likelihood, so the
+log of zero will be negative infinity, we get infinite loss. So this is kind of
+undesirable right because we plugged in a string that could be like a somewhat
+reasonable name but basically what this is saying is that this model is exactly
+0% likely to to predict this name and our loss is infinity on this example and
+really what the reason for that is that J is followed by Q 0 times where's Q J
+Q is 0 and so J Q is 0% likely so it's actually kind of gross and people don't
+like this too much to fix this there's a very simple fix that people like to do
+to sort of like smooth out your model a little bit. And it's called model
+smoothing. And roughly what's happening is that we will add some fake counts.
+So imagine adding a count of one to everything. So we add a count of one like
+this, and then we recalculate the probabilities. And that's model smoothing.
+And you can add as much as you like. You can add five, and that will give you a
+smoother model. And the more you add here, the more uniform model you're going
+to have. and the less you add, the more peaked model you are going to have, of
+course. So 1 is like a pretty decent count to add and that will ensure that
+there will be no zeros in our probability matrix P. And so this will, of
+course, change the generations a little bit. In this case, it didn't, but in
+principle, it could. But what that's going to do now is that nothing will be
+infinity unlikely. So now our model will predict some other probability and we
+see that jq now has a very small probability. So the model still finds it very
+surprising that this was a word or a bigram, but we don't get negative
+infinity. So it's kind of like a nice fix that people like to apply sometimes
+and it's called model smoothing.

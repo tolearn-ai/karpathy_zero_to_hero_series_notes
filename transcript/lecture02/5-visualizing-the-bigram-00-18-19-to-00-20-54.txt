@@ -1,0 +1,28 @@
+looks ugly. So let's erase this ugly mess and let's try to visualize it a bit
+more nicer. So for that we're going to use a library called matplotlib. So
+matplotlib allows us to create figures so we can do things like plt imshow of
+the count array. So this is the 28 by 28 array and this is the structure but
+even this I would say is still pretty ugly. So we're going to try to create a
+much nicer visualization of it and I wrote a bunch of code for that. The first
+thing we're going to need is we're going to need to invert this array here,
+this dictionary. So S to I is a mapping from S to I and in I to S we're going
+to reverse this dictionary. So iterate over all the items and just reverse that
+array. So I to S maps inversely from 0 to A, 1 to B etc. So we'll need that and
+then here's the code that I came up with to try to make this a little bit
+nicer. We create a figure, we plot n and then we visualize a bunch of things
+later. Let me just run it so you get a sense of what this is. Okay so you see
+here that we have the array spaced out and every one of these is basically like
+B follows G zero times B follows H 41 times so A follows J 175 times and so
+what you can see that I'm doing here is first I show that entire array and then
+I iterate over all the individual little cells here and I create a character
+string here which is the inverse mapping I2S of the integer I and the integer J
+so that's those are the bigrams in a character representation and then I plot
+just the bigram text and then I plot the number of times that this bigram
+occurs. Now the reason that there's a dot item here is because when you index
+into these arrays, these are torch tensors, you see that we still get a tensor
+back. So the type of this thing, you'd think it would be just an integer 149
+but it's actually a torch dot tensor and so if you do dot item then it will pop
+out that in individual integer so it will just be 149 so that's what's
+happening there and these are just some options to make it look nice so what is
+the structure of this array we have all these counts and we see that some of
+them occur often as some of them do not occur often

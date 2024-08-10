@@ -1,0 +1,32 @@
+So now let's begin by looking at these bigrams in our dataset and what they
+look like. And these bigrams, again, are just two characters in a row. So for w
+in words, each w here is an individual word, a string. We want to iterate this
+word with consecutive characters. So two characters at a time, sliding it
+through the word. Now, an interesting, nice way, cute way to do this in Python,
+by the way, is doing something like this. for character1, character2 in zip of
+w and w at 1. One column. Print character1, character2. And let's not do all
+the words. Let's just do the first three words. And I'm going to show you in a
+second how this works. But for now, basically, as an example, let's just do the
+very first word alone, Emma. You see how we have Emma, and this will just print
+em, mm, ma. And the reason this works is because w is the string emma, w at one
+column is the string emma, and zip takes two iterators and it pairs them up and
+then creates an iterator over the tuples of their consecutive entries. And if
+any one of these lists is shorter than the other, then it will just halt and
+return. So basically that's why we return em, mm, mm, ma, but then because this
+iterator's second one here runs out of elements, zip just ends, and that's why
+we only get these tuples. So pretty cute. So these are the consecutive elements
+in the first word. Now we have to be careful because we actually have more
+information here than just these three examples. As I mentioned, And we know
+that E is very likely to come first, and we know that A, in this case, is
+coming last. So one way to do this is basically we're going to create a special
+array here of characters, and we're going to hallucinate a special start token
+here. I'm going to call it like special start. So this is a list of one element
+plus w and then plus a special end character. And the reason I'm wrapping the
+list of w here is because w is a string, Emma. List of w will just have the
+individual characters in the list. And then doing this again now, but not
+iterating over w's but over the characters will give us something like this. So
+this is a bigram of the start character and E, and this is a bigram of the A
+and the special end character. And now we can look at, for example, what this
+looks like for Olivia or Eva. And indeed we can actually potentially do this
+for the entire dataset, but we won't print that, that's going to be too much.
+These are the individual character bigrams and we can print them.

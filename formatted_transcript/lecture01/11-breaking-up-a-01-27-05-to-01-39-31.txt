@@ -1,0 +1,181 @@
+And now let's come back to this non-linearity here that we implemented the
+tanh. Now I told you that we could have broken down tanh into its explicit
+atoms in terms of other expressions if we had the exp function. So if you
+remember, tanh is defined like this, and we chose to develop tanh as a single
+function, and we can do that because we know it's derivative and we can
+backpropagate through it. But we can also break down tanh into and express it
+as a function of exp. And I would like to do that now because I want to prove
+to you that you get all the same results and all the same gradients, but also
+because it forces us to implement a few more expressions. It forces us to do
+exponentiation, addition, subtraction, division, and things like that. And I
+think it's a good exercise to go through a few more of these.
+
+Okay, so let's scroll up to the definition of value. And here, one thing that
+we currently can't do is we can't do like a value of, say, 2.0. But we can't
+do, you know, here, for example, we want to add a constant 1. and we can't do
+something like this. And we can't do it because it says int object has no
+attribute data. That's because a plus one comes right here to add, and then
+other is the integer one. And then here Python is trying to access one dot
+data, and that's not a thing. And that's because basically one is not a value
+object, and we only have addition for value objects.
+
+So as a matter of convenience, so that we can create expressions like this and
+make them make sense, we can simply do something like this. Basically, we let
+other alone if other is an instance of value, but if it's not an instance of
+value, we're going to assume that it's a number, like an integer or a float,
+and we're going to simply wrap it in value, and then other will just become
+value of other, and then other will have a data attribute, and this should
+work. So if I just save this, redefine value, then this should work. There we
+go.
+
+Okay, now let's do the exact same thing for multiply, because we can't do
+something like this, again, for the exact same reason. So we just have to go to
+mol and if other is not a value then let's wrap it in value let's redefine
+value and now this works.
+
+Now here's a kind of unfortunate and not obvious part a times two works we saw
+that but two times a is that going to work you'd expect it to right but
+actually it will not and the reason it won't is because python doesn't know
+like when you do a times 2 basically so a times 2, Python will go and it will
+basically do something like a.mol of 2 that's basically what it will call but
+to it, 2 times a is the same as 2.mol of a and it doesn't, 2 can't multiply
+value and so it's really confused about that so instead what happens is in
+Python the way this works is you are free to define something called the rmol
+and rmol is kind of like a fallback.
+
+So if Python can't do 2 times a, it will check if by any chance a knows how to
+multiply 2, and that will be called into rmul. So because Python can't do 2
+times a, it will check is there an rmul in value, and because there is, it will
+now call that, and what we'll do here is we will swap the order of the
+operands. So basically 2 times a will redirect to rmul, and RML will basically
+call a times two. And that's how that will work. So redefining that with RML,
+two times a becomes four.
+
+Okay, now looking at the other elements that we still need, we need to know how
+to exponentiate and how to divide. So let's first do the exponentiation part.
+We're going to introduce a single function exp here. And exp is going to mirror
+10h in the sense that it's a single function that transforms a single scalar
+value and outputs a single scalar value so we pop out the python number we use
+math.exe to exponentiate it create a new value object everything that we've
+seen before the tricky part of course is how do you back propagate through e to
+the x and so here you can potentially pause the video and think about what
+should go here.
+
+Okay, so basically we need to know what is the local derivative of e to the x
+so d by dx of e e to the x is famously just e to the x and we've already just
+calculated e to the x and it's inside out that data so we can do out that data
+times and out that grad that's the chain rule so we're just chaining on to the
+current running grad and this is what the expression looks like it looks a
+little confusing but this is what it is and that's the explanation so
+redefining we should now be able to call a.exp and hopefully the backward pass
+works as well.
+
+Okay and the last thing we'd like to do of course is we'd like to be able to
+divide. Now I actually will implement something slightly more powerful than
+division because division is just a special case of something a bit more
+powerful. So in particular just by rearranging if we would have some kind of a
+b equals value of 4.0 here we'd like to basically be able to do a divide b and
+we'd like this to be able to give us 0.5.
+
+Now division actually can be reshuffled as follows. If we have a divide b
+that's actually the same as a multiplying 1 over b and that's the same as a
+multiplying b to the power of negative 1. And so what I'd like to do instead is
+I basically like to implement the operation of x to the k for some constant k.
+So it's an integer or a float and we would like to be able to differentiate
+this and then as a special case negative one will be division and so I'm doing
+that just because it's more general and yeah you might as well do it that way
+so basically what I'm saying is we can redefine division which we will put here
+somewhere you know we can put it here somewhere what I'm saying is that we can
+redefine division so self divide other this can actually be rewritten as self
+times other to the power of negative one and now value raised to the power of
+negative one we have to now define that.
+
+So here's so we need to implement the pow function where am I going to put the
+pow function maybe here somewhere this is the skeleton for it so this function
+will be called when we try to raise a value to some power and other will be
+that power. Now I'd like to make sure that other is only an int or a float
+usually other is some kind of a different value object but here other will be
+forced to be an int or a float otherwise the math won't work for what we're
+trying to achieve in the specific case that would be a different derivative
+expression if we wanted other to be a value so here we create the up the value
+which is just you know this data raised to the power of other and other here
+could be for example negative one that's what we are hoping to achieve and then
+this is the backward stub.
+
+And this is the fun part which is what is the chain rule expression here for
+back for back propagating through the power function where the power is to the
+power of some kind of constant so this is the exercise and maybe pause the
+video here and see if you can figure it out yourself as to what we should put
+here okay so you can actually go here and look at the derivative rules as an
+example and we see lots of derivative rules that you can hopefully know from
+calculus in particular what we're looking for is the power rule because that's
+telling us that if we're trying to take d by dx of x to the n which is what
+we're doing here then that is just n times x to the n minus 1 right okay so
+that's telling us about the local derivative of this power operation.
+
+So all we want here, basically n is now other, and self.data is x. And so this
+now becomes other, which is n, times self.data, which is now a Python int or a
+float. It's not a value object. We're accessing the data attribute, raised to
+the power of other minus one, or n minus one. I can put brackets around this
+but this doesn't matter because power takes precedence over multiply in PyHelm
+so that would have been okay. And that's the local derivative only but now we
+have to chain it and we chain it just simply by multiplying by a dot grad.
+That's chain rule and this should technically work and we're going to find out
+soon.
+
+But now if we do this, this should now work and we get 0.5 so the forward pass
+works but does the backward pass work and I realize that we actually also have
+to know how to subtract so right now a minus b will not work to make it work we
+need one more piece of code here and basically this is the subtraction and the
+way we're going to implement subtraction is we're going to implement it by
+addition of a negation and then to implement negation we're going to multiply
+by negative one. So just again using the stuff we've already built and just
+expressing it in terms of what we have and a minus b is now working.
+
+Okay so now let's scroll again to this expression here for this neuron and
+let's just compute the backward pass here once we've defined o and let's draw
+it. So here's the gradients for all these leaf nodes for this two-dimensional
+neuron that has a 10h that we've seen before. So now what I'd like to do is I'd
+like to break up this 10h into to this expression here. So let me copy paste
+this here and now instead of we'll preserve the label and we will change how we
+define O.
+
+So in particular we're going to implement this formula here. So we need e to
+the 2x minus 1 over e to the x plus 1. So e to the 2x we need to take 2 times n
+and we need to exponentiate it. That's e to the 2x and then And because we're
+using it twice, let's create an intermediate variable, e, and then define o as
+e plus 1 over e minus 1 over e plus 1. e minus 1 over e plus 1. And that should
+be it, and then we should be able to draw dot of o.
+
+So now before I run this, what do we expect to see? Number one, we're expecting
+to see a much longer graph here because we've broken up into a bunch of other
+operations. But those operations are mathematically equivalent. And so what
+we're expecting to see is number one, the same result here, so the forward pass
+works. And number two, because of that mathematical equivalence, we expect to
+see the same backward pass and the same gradients on these leaf nodes. So these
+gradients should be identical.
+
+So let's run this. So number one, let's verify that instead of a single 10h
+node, we have now exp, and we have plus, we have times negative 1, this is the
+division, and we end up with the same forward pass here. And then the
+gradients, we have to be careful because they're in slightly different order
+potentially. The gradients for w2, x2 should be 0 and 0.5, w2 and x2 are 0 and
+0.5, and w1, x1 are 1 and negative 1.5, 1 and negative 1.5.
+
+So that means that both our forward passes and backward passes were correct
+because this turned out to be equivalent to 10H before. And so the reason I
+wanted to go through this exercise is number one, we got to practice a few more
+operations and writing more backwards passes. And number two, I wanted to
+illustrate the point that the level at which you implement your operations is
+totally up to you. You can implement backward passes for tiny expressions like
+a single individual plus or a single times, or you can implement that for say
+10h which is a kind of a potentially you can see it as a composite operation
+because it's made up of all these more atomic operations but really all of this
+is kind of like a fake concept all that matters is we have some kind of inputs
+and some kind of an output and this output is a function of the inputs in some
+way and as long as you can do forward pass and the backward pass of that little
+operation it doesn't matter what that operation is and how composite it is.
+
+If you can write the local gradients, you can chain the gradient and you can
+continue back propagation. So the design of what those functions are is
+completely up to you.

@@ -1,0 +1,64 @@
+Thing I want to do is I want to compile the training set of this neural network
+right, so create the training set of all the bigrams. Okay, and here I'm going
+to copy paste this code because this code iterates over all the bigrams. So
+here we start with the words, we iterate over all the bigrams and previously,
+as you recall, we did the counts but now we're not going to do counts; we're
+just creating a training set.
+
+Now this training set will be made up of two lists. We have the inputs and the
+targets, the labels. And these bigrams will denote x, y. Those are the
+characters, right? And so we're given the first character of the bigram and
+then we're trying to predict the next one. Both of these are going to be
+integers.
+
+So here we'll take xs.append is just x1, ys.append is x2, and then here we
+actually don't want lists of integers; we will create tensors out of these. So
+xs is torch.tensor of xs and ys is torch.tensor of ys. And then we don't
+actually want to take all the words just yet because I want everything to be
+manageable. So let's just do the first word, which is Emma, and then it's clear
+what these X's and Y's would be.
+
+Here, let me print character one, character two just so you see what's going on
+here. So the bigrams of these characters is dot E, E-M, M-M, M-A, A-dot. So
+this single word, as I mentioned, has one, two, three, four, five examples for
+our neural network. There are five separate examples in EMA, and those examples
+are shown here.
+
+When the input to the neural network is integer 0, the desired label is integer
+5, which corresponds to e. When the input to the neural network is 5, we want
+its weights to be arranged so that 13 gets a very high probability. When 13 is
+put in, we want 13 to have a high probability. When 13 is put in, we also want
+1 to have a high probability. When 1 is input, we want 0 to have a very high
+probability.
+
+So there are five separate input examples to a neural net in this data set. I
+wanted to add a tangent of a note of caution to be careful with a lot of the
+APIs of some of these frameworks. You saw me silently use torch.tensor with a
+lowercase T, and the output looked right. But you should be aware that there's
+actually two ways of constructing a tensor. There's a torch.lowercase tensor
+and there's also a torch.capitalTensor class which you can also construct.
+
+So you can actually call both. You can also do torch.capitalTensor and you get
+an X as in Y as well. So that's not confusing at all. There are threads on what
+is the difference between these two, and unfortunately, the docs are just like
+not clear on the difference. When you look at the docs of lowercase tensor, it
+constructs a tensor with no autograd history by copying data; it just like
+doesn’t make sense.
+
+So the actual difference, as far as I can tell, is explained eventually in this
+random thread that you can google, and really it comes down to, I believe, that
+where is this torch.tensor infers the dtype, the data type automatically, while
+torch.tensor just returns a float tensor. I would recommend to stick to
+torch.lowercase tensor.
+
+So indeed we see that when I construct this with a capital T, the data type
+here of x is float32, but torch.lowercase tensor you see how it's now x.dtype
+is now integer. So it's advised that you use lowercase t, and you can read more
+about it if you like in some of these threads.
+
+But basically I'm pointing out some of these things because I want to caution
+you, and I want you to get used to reading a lot of documentation and reading
+through a lot of Q&As and threads like this. And some of this stuff is
+unfortunately not easy and not very well documented, and you have to be careful
+out there. What we want here is integers because that's what makes sense, and
+so lowercase tensor is what we are using.

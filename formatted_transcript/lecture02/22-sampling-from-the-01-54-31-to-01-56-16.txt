@@ -1,0 +1,22 @@
+Okay, and lastly, before we wrap up, I wanted to show you how you would sample
+from this neural net model. I copy pasted the sampling code from before, where
+remember that we sampled five times. All we did was start at zero, grab the
+current IX row of P, and that was our probability row from which we sampled the
+next index, accumulating that and breaking when zero. Running this gave us
+these results. I still have the P in memory, so this is fine.
+
+Now, this P doesn't come from the row of P. Instead, it comes from this neural
+net. First, we take ix and encode it into a one-hot row of xank. This xank
+multiplies our w, which really just plucks out the row of w corresponding to
+ix. That's really what's happening. Then we get our logits, normalize those
+logits, exponentiate to get counts, and then normalize to get the distribution.
+We can then sample from the distribution.
+
+If I run this, it might seem kind of anticlimactic or climatic, depending on
+how you look at it, but we get the exact same result. That's because this is
+the identical model. Not only does it achieve the same loss, but, as I
+mentioned, these are identical models and this W is the log counts of what
+we've estimated before. We arrived at this answer in a very different way, and
+it has a very different interpretation, but fundamentally, this is basically
+the same model and gives the same samples here. And so, that’s kind of cool.
+Okay.

@@ -1,0 +1,123 @@
+Okay, so I organized everything into a single summary so that hopefully it's a
+bit more clear. So it starts here. We have an input data set. We have some
+inputs to the neural net, and we have some labels for the correct next
+character in a sequence. These are integers. Here I'm using torch generators
+now so that you see the same numbers that I see, and I'm generating 27 neuron
+weights. Each neuron here receives 27 inputs. Then here we're going to plug in
+all the input examples (x's) into a neural net. So here this is a forward pass.
+First, we have to encode all of the inputs into one-hot representations. We
+have 27 classes; we pass in these integers, and xinc becomes an array that is 5
+by 27, with zeros except for a few ones. We then multiply this in the first
+layer of a neural net to get logits. Exponentiate the logits to get fake
+counts, sort of, and normalize these counts to get probabilities.
+
+So these last two lines, by the way, are called the softmax, which I pulled up
+here. Softmax is a very often used layer in a neural net that takes these Zs,
+which are logits, exponentiates them, and divides and normalizes. It's a way of
+taking outputs of a neural net layer, and these outputs can be positive or
+negative. And it outputs probability distributions. It outputs something that
+always sums to one and are positive numbers, just like probabilities. So this
+is kind of like a normalization function, if you want to think of it that way.
+You can put it on top of any other linear layer inside a neural net, and it
+basically makes a neural net output probabilities. That's very often used, and
+we used it as well here. So this is the forward pass, and that's how we made a
+neural net output probability.
+
+Now you'll notice that all of these, this entire forward pass is made up of
+differentiable layers. Everything here we can backpropagate through. We saw
+some of the back propagation in micrograd. This is just multiplication and
+addition. All that's happening here is just multiply and add, and we know how
+to backpropagate through them. Exponentiation we know how to backpropagate
+through. And then here we are summing, and sum is easily backpropagatable as
+well as division. So everything here is a differentiable operation, and we can
+backpropagate through.
+
+Now we achieve these probabilities, which are 5 by 27. For every single
+example, we have a vector of probabilities that sums to 1. And then here I
+wrote a bunch of stuff to sort of break down the examples. So we have five
+examples making up Emma, right? And there are five bigrams inside Emma. So
+bigram example one is that E is the beginning character right after dot. The
+indexes for these are 0 and 5. So then we feed in a 0; that's the input to the
+neural net. We get probabilities from the neural net that are 27 numbers, and
+then the label is 5 because e actually comes after dot. So that's the label,
+and then we use this label 5 to index into the probability distribution here.
+So this index 5 here is 0, 1, 2, 3, 4, 5. It's this number here, which is here.
+
+So that's basically the probability assigned by the neural net to the actual
+correct character. You see that the network currently thinks that this next
+character, that E following dot, is only 1% likely, which is of course not very
+good, right? Because this actually is a training example, and the network
+thinks that this is currently very, very unlikely. But that's just because we
+didn't get very lucky in generating a good setting of W. So right now this
+network thinks this is unlikely, and 0.01 is not a good outcome. So the log
+likelihood then is very negative, and the negative log likelihood is very
+positive, so 4 is a very high negative log likelihood, and that means we're
+going to have a high loss because what is the loss? The loss is just the
+average negative log likelihood.
+
+So the second character is EM, and you see here that also the network thought
+that M following E is very unlikely, 1%. For M following M, it thought it was
+2%, and for A following M, it actually thought it was 7% likely. So just by
+chance, this one actually has a pretty good probability, and therefore a pretty
+low negative log likelihood. And finally here, it thought this was 1% likely.
+Overall, our average negative log likelihood, which is the loss, the total loss
+that summarizes basically how well this network currently works, at least on
+this one word—not on the full dataset, just the one word—is 3.76, which is
+actually very fairly high loss. This is not a very good setting of W's.
+
+Now here's what we can do: We're currently getting 3.76. We can actually come
+here, and we can change our W; we can resample it. So let me just add one to a
+different seed, and then we get a different W, and then we can rerun this. With
+this different seed, with this different setting of W's, we now get 3.37, so
+this is a much better W, right? And it's better because the probabilities just
+happen to come out higher for the characters that actually are next. And so you
+can imagine actually just resampling this; you know we can try two. So okay,
+this was not very good. Let's try one more. We can try three. Okay, this was a
+terrible setting because we have a very high loss.
+
+So anyway, I'm going to erase this. What I'm doing here, which is just guess
+and check of randomly assigning parameters and seeing if the network is good,
+that is amateur hour. That's not how you optimize in a neural net. The way you
+optimize in a neural net is you start with some random guess, and we're going
+to commit to this one even though it's not very good. But now the big deal is
+we have a loss function. This loss is made up only of differentiable
+operations, and we can minimize the loss by tuning W's by computing the
+gradients of the loss with respect to these W matrices. And so then we can tune
+W to minimize the loss and find a good setting of W using gradient-based
+optimization.
+
+So let's see how that will work. Now things are actually going to look almost
+identical to what we had with micrograd. So here I pulled up the lecture from
+micrograd, the notebook that's from this repository, and when I scroll all the
+way to the end where we left off with micrograd, we had something very, very
+similar. We had a number of input examples; in this case, we had four input
+examples inside Xs, and we had their targets, desired targets. Just like here,
+we have our X's now, but we have five of them, and they're now integers instead
+of vectors. But we're going to convert our integers to vectors, except our
+vectors will be 27 large instead of 3 large. Then here what we did was first a
+forward pass where we ran a neural net on all the inputs to get predictions.
+
+Our neural net at the time, this N of X, was a multi-layer perceptron. Our
+neural net is going to look different because our neural net is just a single
+linear layer followed by a softmax. So that's our neural net. And the loss here
+was the mean squared error. So we simply subtracted the prediction from the
+ground truth and squared it and summed it all up. That was the loss. The loss
+was the single number that summarized the quality of the neural net. When the
+loss is low, like almost zero, that means the neural net is predicting
+correctly. So we had a single number that summarized the performance of the
+neural net, and everything here was differentiable and was stored in a massive
+compute graph.
+
+Then we iterated over all the parameters. We made sure that the gradients were
+set to zero and called loss.backward. Loss.backward initiated backpropagation
+at the final output node of loss, right? So yeah, remember these expressions?
+We had loss all the way at the end. We start backpropagation and we went all
+the way back and made sure that we populated all the parameters .grad. So .grad
+started at zero, but backpropagation filled it in. Then in the update, we
+iterated over all the parameters and simply did a parameter update where every
+single element of our parameters was nudged in the opposite direction of the
+gradient. And so we're going to do the exact same thing here. So I'm going to
+pull this up on the side here so that we have it available. And we're actually
+going to do the exact same thing. So this was the forward pass.
+
+So where we did this, props is our y-pred.

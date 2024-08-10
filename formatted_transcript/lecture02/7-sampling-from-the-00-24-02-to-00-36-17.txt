@@ -1,0 +1,125 @@
+
+
+array actually has all the information necessary for us to actually sample from
+this bigram character level language model and roughly speaking what we're
+going to do is we're just going to start following these probabilities and
+these counts and we're going to start sampling from the from the model so in
+the beginning of course we start with the dot the start token dot so to sample
+the first character of a name we're looking at this row here so we see that we
+have the counts and those counts externally are telling us how often any one of
+these characters is to start a word so if we take this n and we grab the first
+row we can do that by using just indexing a zero and then using this notation
+colon for the rest of that row So n, zero column is indexing into the zeroth
+row and then it's grabbing all the columns. And so this will give us a
+one-dimensional array of the first row. So 0, 4, 4, 10. You notice 0, 4, 4, 10,
+1, 3, 0, 6, 1, 5, 4, 2, etc. It's just the first row. The shape of this is 27.
+It's just the row of 27. And the other way that you can do this also is you
+just grab the zeroth row like this. This is equivalent. Now, these are the
+counts. And now what we'd like to do is we'd like to basically sample from
+this. Since these are the raw counts, we actually have to convert this to
+probabilities. So we create a probability vector. So we'll take n of 0. And
+we'll actually convert this to float first. Okay, so these integers are
+converted to float floating-point numbers and the reason we're creating floats
+is because we're about to normalize these counts. So to create a probability
+distribution here we want to divide. We basically want to do P divide P dot
+sum. And now we get a vector of smaller numbers and these are now
+probabilities. So of course because we divided by the sum the sum of P now is
+1. So this is a nice proper probability distribution, it sums to one and this
+is giving us the probability for any single character to be the first character
+of a word. So now we can try to sample from this distribution. To sample from
+these distributions we're going to use torch.multinomial which I've pulled up
+here. So torch.multinomial returns samples from the multinomial probability
+distribution which is a complicated way of saying you give me probabilities and
+I will give you integers which are sampled according to the probability
+distribution. So this is the signature of the method and to make everything
+deterministic we're going to use a generator object in PyTorch. So this makes
+everything deterministic so when you run this on your computer you're going to
+get the exact same results that I'm getting here on my computer. So let me show
+you how this works. Here's the deterministic way of creating a torch generator
+object seeding it with some number that we can agree on so that seeds a
+generator gets gives us an object G and then we can pass that G to a function
+that creates here random numbers towards that Rand creates random numbers three
+of them and it's using this generator object to as a source of randomness. So
+without normalizing it I can just print this is sort of like numbers between 0
+& 1 that are random according to this thing and whenever I run it again I'm
+always going to get the same result because I keep using the same generator
+object which I'm seeding here and then if I divide to normalize I'm going to
+get a nice probability distribution of just three elements and then we can use
+torch.multinomial to draw samples from it. So this is what that looks like.
+torch.multinomial will take the torch tensor of probability distributions then
+we can ask for a number of samples like say 20. Replacement equals true means
+that when we draw an element we can draw it and then we can put it back into
+the list of eligible indices to draw again and we have to specify replacement
+as true because by default for some reason it's false and I think you know it's
+just something to be careful with and the generator is passed in here so we are
+going to always get deterministic results the same results so if I run these
+two we're going to get a bunch of samples from this distribution now you'll
+notice here that the probability for the first element in this tensor is 60%.
+So in these 20 samples we'd expect 60% of them to be 0. We'd expect 30% of them
+to be 1. And because the element index 2 has only 10% probability, very few of
+these samples should be 2. And indeed we only have a small number of 2s. and we
+can sample as many as we would like and the more we sample the more these
+numbers should roughly have the distribution here so we should have lots of
+zeros half as many ones and we should have three times as few sorry as few ones
+and three times as few twos so you see that we have very few twos we have some
+ones and most of them are zero so that's what torsion multi-numeral is doing
+for us here we are interested in this row we've created this um p here and now
+we can sample from it so if we use the same seed and then we sample from this
+distribution let's just get one sample then we see that the sample is say 13 so
+this will be the index and let's you see how it's a tensor that wraps 13 we
+again have to use dot item to pop out that integer and now index would be just
+the number 13 and of course the we can do we can map the i2s of ix to figure
+out exactly which character we're sampling here, we're sampling M. So we're
+saying the first character is M in our generation. And just looking at the row
+here, M was drawn and we can see that M actually starts a large number of
+words. M started 2,500 words out of 32,000 words, so almost a bit less than 10%
+of the words start with M. So this is actually a fairly likely character to
+draw. So that would be the first character of our word and now we can continue
+to sample more characters because now we know that m is already sampled. So now
+to draw the next character we will come back here and we will look for the row
+that starts with m. So you see m and we have a row here. So we see that mdot is
+516, ma is this many, mb is this many, etc. So these are the counts for the
+next row and that's the next character that we are going to now generate. So I
+think we are ready to actually just write out the loop because I think you're
+starting to get a sense of how this is going to go. We always begin at index 0
+because that's the start token and then while true we're going to grab the row
+corresponding to index that we're currently on so that's P so that's n array at
+IX converted to float is RP then we normalize the speed to sum to one I
+accidentally ran the infinite loop we normalize p to sum to 1 then we need this
+generator object and we're going to initialize up here and we're going to draw
+a single sample from this distribution and then this is going to tell us what
+index is going to be next if the index sampled is 0 then that's now the end
+token so we will break otherwise we are going to print s2i of ix, i2s of ix and
+that's pretty much it we're just... this should work. Okay more. So that's the
+name that we've sampled. We started with M, the next step was O, then R and
+then dot and this dot we print it here as well. So let's now do this a few
+times. So let's actually create an out list here and instead of printing we're
+going to append so out that append this character and then here let's just
+print it at the end so let's just join up all the outs and we're just going to
+print more. Okay now we're always getting the same result because of the
+generator. So if we want to do this a few times we can go for i in range 10, we
+can sample 10 names and we can just do that 10 times. And these are the names
+that we're getting out. Let's do 20. I'll be honest with you this doesn't look
+right. So I stared at it a few minutes to convince myself that it actually is
+right. The reason these samples are so terrible is that bigram language model
+is actually just like really terrible. We can generate a few more here. And you
+can see that they're kind of like their name like a little bit like Keanu,
+Riley, etc. But they're just like totally messed up. And I mean, the reason
+that this is so bad, like we're generating H as a name, but you have to think
+through it from the model's eyes. It doesn't know that this age is the very
+first age. All it knows is that age was previously and now how likely is age
+the last character? Well it's somewhat likely and so it just makes it last
+character and doesn't know that there were other things before it or there were
+not other things before it and so that's why it's generating all these like
+some nonsense names. Another way to do this is to convince yourself that it is
+actually doing something reasonable even though it's so terrible is these
+little p's here are 27 right like 27 so how about if we did something like this
+instead of p having any structure whatsoever how about if p was just torch dot
+ones of 27 by default this is a float 32 so this is fine divide 27 so what I'm
+doing here is this is the uniform distribution which will make everything
+equally likely and we can sample from that so let's see if that does any better
+okay so it's this is what you have from a model that is completely untrained
+where everything is equally likely so it's obviously garbage and then if we
+have a trained model which is trained on just bigrams this is what we get. So
+you can see that it is more name-like. It is actually working. It's just my
+grammar is so terrible and we have to do better.

@@ -1,0 +1,82 @@
+Okay, so we fed our 27 dimensional inputs into a first layer of a neural net
+that has 27 neurons, right? So we have 27 inputs, and now we have 27 neurons.
+These neurons perform w times x, they don't have a bias, and they don't have a
+non-linearity like tan h. We're going to leave them to be a linear layer. In
+addition to that, we're not going to have any other layers. This is going to be
+it. It's just going to be the dumbest, smallest, simplest neural net, which
+just a single linear layer. And now I'd like to explain what I want those 27
+outputs to be. Intuitively what we're trying to produce here for every single
+input example is we're trying to produce some kind of a probability
+distribution for the next character in a sequence, and there's 27 of them. But
+we have to come up with like precise semantics for exactly how we're going to
+interpret these 27 numbers that these neurons take on. Now intuitively you see
+here that these numbers are negative and some of them are positive etc. And
+that's because these are coming out of the neural net layer initialized with
+these normal distribution parameters. But what we want is we want something
+like we had here. Like each row here told us the counts and then we normalize
+the counts to get probabilities. And we want something similar to come out of
+the neural net. But what we just have right now is just some negative and
+positive numbers. Now we want those numbers to somehow represent the
+probabilities for the next character. But you see that probabilities, they have
+a special structure. They're positive numbers and they sum to one. And so that
+doesn't just come out of a neural net. And then they can't be counts because
+these counts are positive and counts are integers. So counts are also not
+really a good thing to output from a neural net. So instead what the neural net
+is going to output and how we are going to interpret the 27 numbers is that
+these 27 numbers are giving us log counts basically. So instead of giving us
+counts directly like in this table, they're giving us log counts. And to get
+the counts we're going to take the log counts and we're going to exponentiate
+them. Now exponentiation takes the following form. It takes numbers that are
+negative or they are positive. It takes the entire real line. And then if you
+plug in negative numbers, you're going to get e to the x, which is always below
+one. So you're getting numbers lower than one. And if you plug in numbers
+greater than zero, you're getting numbers greater than one, all the way growing
+to the infinity. And this here grows to zero. So basically we're going to take
+these numbers here and instead of them being positive and negative in all over
+the place, we're going to interpret them as log counts and then we're going to
+element wise exponentiate these numbers. Exponentiating them now gives us
+something like this and you see that these numbers now because they went
+through an exponent, all the negative numbers turned into numbers below one
+like 0.338 and all the positive numbers originally turned into even more
+positive numbers sort of greater than one so like for example seven is some
+positive number over here that is greater than zero but exponentiated outputs
+here basically give us something that that we can use and interpret as the
+equivalent of counts originally. So you see these counts here, 112, 751, one,
+et cetera. The neural net is kind of now predicting counts. And these counts
+are positive numbers. They can never be below zero, so that makes sense. And
+they can now take on various values depending on the settings of W. So let me
+break this down. We're going to interpret these to be the log counts. In other
+words for this that is often used is so-called logits. These are logits, log
+counts. Then these will be sort of the counts, logits exponentiated. And this
+is equivalent to the n matrix, sort of the n array that we used previously.
+Remember this was the n? This is the array of counts and each row here are the
+counts for the next character, sort of. So those are the counts and now the
+probabilities are just the counts normalized. And so I'm not going to find the
+same, but basically I'm not going to scroll all over the place. We've already
+done this. We want to count that sum along the first dimension and we want to
+keep them as true. We went over this and this is how we normalize the rows of
+our counts matrix to get our probabilities. Props. So now these are the
+probabilities and these are the counts that we have currently and now when I
+show the probabilities you see that every row here of course will sum to one.
+because they're normalized and the shape of this is 5 by 27. And so really what
+we've achieved is for every one of our five examples we now have a row that
+came out of a neural net and because of the transformations here we made sure
+that this output of this neural net now are probabilities or we can interpret
+to be probabilities. So our w here gave us logits and then we interpret those
+those to be log counts. We exponentiate to get something that looks like
+counts. And then we normalize those counts to get a probability distribution.
+And all of these are differentiable operations. So what we've done now is we
+are taking inputs. We have differentiable operations that we can back propagate
+through, and we're getting out probability distributions. So for example, for
+the zeroth example that fed in, right, which was the zeroth example here a
+one-hot vector of zero and it basically corresponded to feeding in this example
+here. So we're feeding in a dot into a neural net and the way we fed the dot
+into a neural net is that we first got its index, then we one-hot encoded it,
+then it went into the neural net and out came this distribution of
+probabilities and its shape is 27. There's 27 numbers and we're going to
+interpret this as the neural nets assignment for how likely every one of these
+characters, the 27 characters, are to come next. And as we tune the weights w,
+we're going to be of course getting different probabilities out for any
+character that you input. And so now the question is just can we optimize and
+find a good w such that the probabilities coming out are pretty good and the
+way we measure pretty good is by the loss function.

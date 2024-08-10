@@ -1,0 +1,125 @@
+Okay, so we're actually in a pretty good spot now. We trained a bigram language
+model, and we trained it really just by counting how frequently any pairing
+occurs, and then normalizing so that we get a nice probability distribution. So
+really these elements of this array P are really the parameters of our bigram
+language model, giving us and summarizing the statistics of these bigrams. So
+we train the model and then we know how to sample from the model. We just
+iteratively sample the next character and feed it in each time and get the next
+character. Now what I'd like to do is I'd like to somehow evaluate the quality
+of this model. We'd like to somehow summarize the quality of this model into a
+single number. How good is it at predicting the training set and as an example.
+So in the training set we can evaluate now the training loss and this training
+loss is telling us about sort of the quality of this model in a single number
+just like we saw in micrograd so let's try to think through the quality of the
+model and how we would evaluate it basically what we're going to do is we're
+going to copy paste this code that we previously used for counting okay and let
+me just print these bigrams first we're gonna use f strings and I'm gonna print
+character one followed by character two these are the bigrams and and then I
+don't want to do it for all the words, just do the first three words. So here
+we have Emma, Olivia, and Ava bigrams. Now what we'd like to do is we'd like to
+basically look at the probability that the model assigns to every one of these
+bigrams. So in other words, we can look at the probability, which is summarized
+in the matrix B, of ix1, ix2, and then we can print it here as probability. and
+because these probabilities are way too large let me percent or colon 0.4f to
+like truncate it a bit so what do we have here right we're looking at the
+probabilities that the model assigns to every one of these bigrams in the data
+set and so we can see some of them are four percent three percent etc just to
+have a measuring stick in our mind by the way we have 27 possible characters or
+tokens and if everything was equally likely then you'd expect all these
+probabilities to be four percent roughly so anything above four percent means
+that we've learned something useful from these bigram statistics and you see
+that roughly some of these are four percent but some of them are as high as 40
+percent 35 percent and so on so you see that the model actually assigned a
+pretty high probability to whatever's in the training set and so that that's a
+good thing basically if you have a very good model you'd expect that these
+probabilities should be near 1 because that means that your model is correctly
+predicting what's going to come next especially on the training set where you
+trained your model. So now we'd like to think about how can we summarize these
+probabilities into a single number that measures the quality of this model. Now
+when you look at the literature into maximum likelihood estimation and
+statistical modeling and so on you'll see that what's typically used here is
+something called the likelihood and the likelihood is the product of all of
+these probabilities. And so the product of all these probabilities is the
+likelihood. And it's really telling us about the probability of the entire data
+set assigned by the model that we've trained. And that is a measure of quality.
+So the product of these should be as high as possible when you are training the
+model and when you have a good model. Your product of these probabilities
+should be very high. Now, because the product of these probabilities is an
+unwieldy thing to work with, you can see that all of them are between 0 and 1,
+so your product of these probabilities will be a very tiny number. So for
+convenience, what people work with usually is not the likelihood, but they work
+with what's called the log likelihood. So the product of these is the
+likelihood. To get the log likelihood, we just have to take the log of the
+probability. And so the log of the probability here, I have the log of x from 0
+to 1. The log is a, you see here, monotonic transformation of the probability
+where if you pass in 1 you get 0 so probability 1 gets you log probability of 0
+and then as you go lower and lower probability the log will grow more and more
+negative until all the way to negative infinity at 0 so here we have a lock
+prob which is really just a torch.log of probability let's print it out to get
+a sense of what that looks like log prob also 0.4f. Okay so as you can see when
+we plug in numbers that are very close some of our higher numbers we get closer
+and closer to zero and then if we plug in very bad probabilities we get more
+and more negative number that's bad. So and the reason we work with this is for
+large extent convenience right because we have mathematically that if you have
+some product a times b times c of all these probabilities, right, the
+likelihood is the product of all these probabilities, then the log of these is
+just log of A plus log of B plus log of C if you remember your logs from your
+high school or undergrad and so on. So we have that basically the likelihood is
+the product of probabilities, the log likelihood is just the sum of the logs of
+the individual probabilities so log likelihood starts at zero and then log
+likelihood here we can just accumulate simply and then the end we can print
+this print the log likelihood f strings maybe you're familiar with this so log
+likelihood is negative 38 okay now we actually want so how high can log
+likelihood get it can go to zero so when all the probabilities are one log
+likelihood will be zero and then when all the probabilities are lower this will
+grow more and more negative now we don't actually like this because what we'd
+like is a loss function and a loss function has the semantics that low is good
+because we're trying to minimize the loss so we actually need to invert this
+and that's what gives us something called the negative log likelihood negative
+log likelihood is just negative of the log likelihood these are f strings by
+the way if you'd like to look this up negative log likelihood equals so
+negative log likelihood now is just negative of it and so the negative log
+likelihood is a very nice loss function because the lowest it can get is zero
+and the higher it is the worse off the predictions are that you're making and
+then one more modification to this that sometimes people do is that for
+convenience they actually like to to normalize by they like to make it an
+average instead of a sum and so here let's just keep some counts as well so n
+plus equals one starts at zero and then here we can have sort of like a
+normalized log likelihood if we just normalize it by the count then we will
+sort of get the average log likelihood. So this would be usually our loss
+function here. This is what we would use. So our loss function for the training
+set assigned by the model is 2.4. That's the quality of this model. And the
+lower it is, the better off we are. And the higher it is, the worse off we are.
+And the job of our training is to find the parameters that minimize the
+negative log likelihood loss and that would be like a high quality model. Okay
+so to summarize I actually wrote it out here so our goal is to maximize
+likelihood which is the product of all the probabilities assigned by the model
+and we want to maximize this likelihood with respect to the model parameters
+and in our case the model parameters here are defined in the table these
+numbers the probabilities are the model parameters, sort of in our diagram
+language model so far. But you have to keep in mind that here we are storing
+everything in a table format, the probabilities, but what's coming up as a
+brief preview is that these numbers will not be kept explicitly, but these
+numbers will be calculated by a neural network. So that's coming up. And we
+want to change and tune the parameters of these neural networks. We want to
+change these parameters to maximize the likelihood, the product of the
+probabilities. Now maximizing the likelihood is equivalent to maximizing the
+log likelihood because log is a monotonic function. Here's the graph of log and
+basically all it is doing is it's just scaling your, you can look at it as just
+a scaling of the loss function. And so the optimization problem here and here
+are actually equivalent because this is just scaling. You can look at it that
+way. And so these are two identical optimization problems. Maximizing the log
+likelihood is equivalent to minimizing the negative log likelihood. And then in
+practice people actually minimize the average negative log likelihood to get
+numbers like 2.4. And then this summarizes the quality of your model. And we'd
+like to minimize it and make it as small as possible. And the lowest it can get
+is 0. And the lower it is, the better off your model is because it's assigning
+high probabilities to your data. Now let's estimate the probability over the
+entire training set just to make sure that we get something around 2.4. Let's
+run this over the entire, oops, let's take out the print statement as well.
+Okay, 2.45 for the entire training set. Now what I'd like to show you is that
+you can actually evaluate the probability for any word that you want. Like for
+example, if we just test a single word, Andre, and bring back the print
+statement, then you see that Andre is actually kind of like an unlikely word or
+like on average we take three log probability to represent it and roughly
+that's because EJ apparently is very uncommon as an example

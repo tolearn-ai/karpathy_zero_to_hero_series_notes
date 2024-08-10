@@ -1,0 +1,47 @@
+So now let's construct our first neuron. This neuron will look at these input
+vectors. And as you remember from micrograd, these neurons basically perform a
+very simple function, wx plus b, where wx is a dot product, right? So we can
+achieve the same thing here. Let's first define the weights of this neuron,
+basically. What are the initial weights at initialization for this neuron.
+Let's initialize them with torch.random. Torch.random fills a tensor with
+random numbers drawn from a normal distribution. And a normal distribution has
+a probability density function like this. And so most of the numbers drawn from
+this distribution will be around zero, but some of them will be as high as
+almost three and so on. And very few numbers will be above 3 in magnitude. So
+we need to take a size as an input here and I'm going to use size as to be 27
+by 1. So 27 by 1 and then let's visualize W. So W is a column vector of 27
+numbers and these weights are then multiplied by the inputs. So now to perform
+this multiplication we can take X encoding and we can multiply it with W. This
+is a matrix multiplication operator in PyTorch. And the output of this
+operation is 5 by 1. The reason it's 5 by 1 is the following. We took x
+encoding, which is 5 by 27, and we multiplied it by 27 by 1. And in matrix
+multiplication, you see that the output will become 5 by 1, because these 27
+will multiply and add. So basically what we're seeing here out of this
+operation is we are seeing the five activations of this neuron on these five
+inputs and we've evaluated all of them in parallel. We didn't feed in just a
+single input to the single neuron, we fed in simultaneously all the five inputs
+into the same neuron and in parallel PyTorch has evaluated the wx plus b but
+here is just wx there's no bias it has value w times x for all of them
+independently. Now instead of a single neuron though I would like to have 27
+neurons and I'll show you in a second why I want 27 neurons. So instead of
+having just a one here which is indicating this presence of one single neuron
+we can use 27 and then when W is 27 by 27 this will in parallel evaluate all
+the 27 neurons on all the five inputs giving us a much better much much bigger
+result so now what we've done is 5 by 27 multiplied 27 by 27 and the output of
+this is now 5 by 27. So we can see that the shape of this is 5 by 27. So what
+is every element here telling us, right? It's telling us for every one of 27
+neurons that we created, what is the firing rate of those neurons on every one
+of those five examples? So the element for example 3 comma 13 is giving us the
+firing rate of the 13th neuron looking at the third input and the way this was
+achieved is by a dot product between the third input and the 13th column of
+this W matrix here okay So using matrix multiplication we can very efficiently
+evaluate the dot product between lots of input examples in a batch and lots of
+neurons where all of those neurons have weights in the columns of those W's and
+in matrix multiplication we're just doing those dot products and in parallel.
+Just to show you that this is the case we can take x-enck and we can take the
+third row and we can take the w and take its 13th column and then we can do
+xsync at 3 element twice multiply with w at 13 and sum that up that's wx plus b
+well there's no plus b it's just wx dot product and that's this number so you
+see that this is just being done efficiently by the matrix multiplication
+operation for all the input examples and for all the output neurons of this
+first layer.

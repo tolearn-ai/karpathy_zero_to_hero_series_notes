@@ -1,0 +1,75 @@
+Okay, so now let's dive right in and implement micrograph step by step. The
+first thing I'd like to do is I'd like to make sure that you have a very good
+understanding intuitively of what a derivative is and exactly what information
+it gives you. So let's start with some basic imports that I copy-paste in every
+Jupyter notebook always. And let's define a function, a scalar valid function,
+f of x, as follows. So I just made this up randomly. I just wanted a scalar
+valid function that takes a single scalar x and returns a single scalar y. And
+we can call this function of course so we can pass and say 3.0 and get 20 back
+Now we can also plot this function to get a sense of its shape You can tell
+from the mathematical expression that this is probably a parabola. It's
+quadratic and so if we just create a set of Skilled values that we can feed in
+using for example a range from negative 5 to 5 and steps of 0.25 So this is so
+X is just from negative 5 to 5 not including 5 in steps of 0.25 and we can
+actually call this function on this numpy array as well so we get a set of y's
+if we call f on x's and these y's are basically also applying uh function on
+every one of these elements independently and we can plot this using math plot
+lib so plt.plot x's and y's and we get a nice parabola so previously here we
+fed in 3.0 somewhere here and we received 20 back which is here the y
+coordinate. So now I'd like to think through what is the derivative of this
+function at any single input point x right so what is the derivative at
+different points x of this function. Now if you remember back to your calculus
+class you've probably derived derivatives so we take this mathematical
+expression 3x squared minus 4x plus 5 and you would write out on a piece of
+paper and you would you know apply the product rule and all the other rules and
+derive the mathematical expression of the great derivative of the original
+function and then you could plug in different taxes and see what the derivative
+is we're not going to actually do that because no one in neural networks
+actually writes out the expression for the neural net it would be a massive
+expression um it would be you know thousands tens of thousands of terms no one
+actually derives the derivative of course and so we're not going to take this
+kind of like symbolic approach instead what i'd like to do is I'd like to look
+at the definition of derivative and just make sure that we really understand
+what derivative is measuring what it's telling you about the function and so if
+we just look up derivative we see that okay so this is not a very good
+definition of derivative this is a definition of what it means to be
+differentiable but if you remember from your calculus it is the limit as h h
+goes to zero of f of x plus h minus f of x over h. So basically what it's
+saying is if you slightly bump up, you're at some point x that you're
+interested in or a, and if you slightly bump up, you slightly increase it by a
+small number h, how does the function respond? With what sensitivity does it
+respond? Where's the slope at that point? Does the function go up or does it go
+down? And by how much? And that's the slope of that function, the slope of that
+response at that point. And so we can basically evaluate the derivative here
+numerically by taking a very small h. Of course, the definition would ask us to
+take h to 0. We're just going to pick a very small h, 0.001. And let's say
+we're interested in 0.3.0. So we can look at f of x, of course, as 20. And now
+f of x plus h. So if we slightly nudge x in a positive direction, how is the
+function going to respond? and just looking at this, do you expect f of x plus
+h to be slightly greater than 20 or do you expect it to be slightly lower than
+20? And since this 3 is here and this is 20, if we slightly go positively, the
+function will respond positively. So you'd expect this to be slightly greater
+than 20. And by how much is telling you the strength of that slope, right? The
+size of that slope. So f of x plus h minus f of x, this is how much the
+function responded in the positive direction. And we have to normalize by the
+run. So we have the rise over run to get the slope. So this, of course, is just
+a numerical approximation of the slope because we have to make h very, very
+small to converge to the exact amount. Now if I'm doing too many zeros, at some
+point I'm going to get an incorrect answer because we're using floating point
+arithmetic and the representations of all these numbers in computer memory is
+finite and at some point we get into trouble. So we can converge towards the
+right answer with this approach. But basically at 3 the slope is 14 and you can
+see that by taking 3x square minus 4x plus 5 and differentiating it in our
+head. So 3x squared would be 6x minus 4. And then we plug in x equals 3. So
+that's 18 minus 4 is 14. So this is correct. So that's at 3. Now, how about the
+slope at, say, negative 3? What would you expect for the slope? Now, telling
+the exact value is really hard. But what is the sign of that slope? So at
+negative 3, if we slightly go in the positive direction at x, The function
+would actually go down and so that tells you that the slope would be negative.
+So we'll get a slight number below Below 20. And so if we take the slope we
+expect something negative negative 22, okay and At some point here, of course
+the slope would be 0 now for this specific function I looked it up previously
+and it's at point 2 over 3. So at roughly 2 over 3 That's somewhere here This
+derivative would be 0. So basically at that precise point Yeah at that precise
+point if we nudge in a positive direction the function doesn't respond this
+stays the same almost And so that's why the slope is 0. Okay now
